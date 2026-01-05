@@ -16,7 +16,7 @@ ALLOWED_HOSTS: list[str] = []
 # Application definition
 
 INSTALLED_APPS = [
-    "apps.infra.Auth.apps.AuthConfig",  # Movido para o topo para garantir que o modelo de usuário customizado seja carregado primeiro
+    "apps.infra.auth.apps.AuthConfig",  # Movido para o topo para garantir que o modelo de usuário customizado seja carregado primeiro
 
     # Django
     "django.contrib.admin",
@@ -68,7 +68,7 @@ DATABASES = {
 
 
 # 🔐 Custom User
-AUTH_USER_MODEL = "Auth.CustomUser"
+AUTH_USER_MODEL = "custom_auth.CustomUser"
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

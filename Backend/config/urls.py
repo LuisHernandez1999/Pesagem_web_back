@@ -18,8 +18,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from apps.infra.Auth.views.login_views import LoginApiView
-from apps.infra.Auth.views.register_views import RegisterUserAPIView
+from apps.infra.auth.views.login_views import LoginApiView
+from apps.infra.auth.views.register_views import RegisterUserAPIView
 
 urlpatterns = [
     path("admin/", admin.site.urls),

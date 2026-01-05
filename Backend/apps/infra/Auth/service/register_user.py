@@ -1,8 +1,8 @@
 from django.db import IntegrityError, transaction
 from django.db import transaction
-from apps.infra.Auth.models.custom_user import CustomUser
-from apps.infra.Auth.exceptions.auth_exceptions import UserAlreadyExists
-from apps.infra.Auth.dto.register_dto import RegisterUserDTO
+from apps.infra.auth.models.custom_user import CustomUser
+from apps.infra.auth.exceptions.auth_exceptions import UserAlreadyExists
+from apps.infra.auth.dto.register_dto import RegisterUserDTO
 
 
 class RegisterUserService:

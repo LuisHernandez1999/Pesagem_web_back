@@ -1,4 +1,4 @@
-from apps.infra.Auth.dto.register_dto import RegisterUserDTO
+from apps.infra.auth.dto.register_dto import RegisterUserDTO
 
 def register_user_mapper(request) -> RegisterUserDTO:
     return RegisterUserDTO(

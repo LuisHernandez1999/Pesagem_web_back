@@ -1,12 +1,12 @@
 from typing import cast
 from django.contrib.auth import authenticate
 
-from apps.infra.Auth.dto.login_dto import LoginUserDTO
-from apps.infra.Auth.exceptions.auth_exceptions import (
+from apps.infra.auth.dto.login_dto import LoginUserDTO
+from apps.infra.auth.exceptions.auth_exceptions import (
     InvalidCredentials,
     UserInactive,
 )
-from apps.infra.Auth.models import CustomUser
+from apps.infra.auth.models.custom_user import CustomUser
 
 
 class LoginService:

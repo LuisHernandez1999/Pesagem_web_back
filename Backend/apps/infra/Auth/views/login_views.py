@@ -2,9 +2,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from apps.infra.Auth.dto.login_dto import LoginUserDTO
-from apps.infra.Auth.service.login import LoginService
-from apps.infra.Auth.exceptions.auth_exceptions import AuthException
+from apps.infra.auth.dto.login_dto import LoginUserDTO
+from apps.infra.auth.service.login import LoginService
+from apps.infra.auth.exceptions.auth_exceptions import AuthException
 
 
 class LoginApiView(APIView):

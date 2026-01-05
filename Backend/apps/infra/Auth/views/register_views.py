@@ -3,11 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from apps.infra.Auth.mappers.user_mappers.post_user_mapper import (
+from apps.infra.auth.mappers.user_mappers.post_user_mapper import (
     register_user_mapper,
 )
-from apps.infra.Auth.service.register_user import RegisterUserService
-from apps.infra.Auth.exceptions.auth_exceptions import AuthException
+from apps.infra.auth.service.register_user import RegisterUserService
+from apps.infra.auth.exceptions.auth_exceptions import AuthException
 
 
 class RegisterUserAPIView(APIView):
