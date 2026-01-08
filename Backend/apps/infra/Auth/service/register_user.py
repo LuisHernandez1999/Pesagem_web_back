@@ -1,4 +1,3 @@
-# apps/infra/auth/service/register_user.py
 from django.db import transaction
 from apps.infra.auth.models.custom_user import CustomUser
 from apps.infra.auth.dto.register_dto import RegisterUserDTO

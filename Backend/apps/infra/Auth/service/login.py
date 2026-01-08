@@ -1,7 +1,6 @@
 from typing import cast
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from apps.infra.auth.dto.login_dto import LoginUserDTO
 from apps.infra.auth.exceptions.auth_exceptions import (
     InvalidCredentials,
