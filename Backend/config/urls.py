@@ -21,11 +21,14 @@ from apps.infra.auth.views.register_views import RegisterUserAPIView
 from django.urls import path
 from apps.infra.auth.views.generate_invite_view import GenerateInviteAPIView
 from apps.infra.auth.views.register_views import RegisterByInviteAPIView
+from apps.pesagem.views.veiculos_views import VeiculoListApiView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/login/", LoginApiView.as_view(), name="login"),
     path("api/register/", RegisterUserAPIView.as_view(), name="register"),
-    path("api/invite/", GenerateInviteAPIView.as_view()),
-    path("api/register-by-invite/", RegisterByInviteAPIView.as_view()),
+    path("api/invite/", GenerateInviteAPIView.as_view(),name="Invite"),
+    path("api/register-by-invite/", RegisterByInviteAPIView.as_view(),name="InviteRegister"),
+    path("api/veiculos/",VeiculoListApiView.as_view(),name="VeiculosList")
+
 ]
