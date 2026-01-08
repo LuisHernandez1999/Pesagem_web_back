@@ -17,6 +17,7 @@ ALLOWED_HOSTS: list[str] = []
 
 INSTALLED_APPS = [
     "apps.infra.auth.apps.AuthConfig",  # Movido para o topo para garantir que o modelo de usuário customizado seja carregado primeiro
+    "apps.pesagem.apps.PesagemConfig",
     "rest_framework_simplejwt",
     "corsheaders",
     # Django
@@ -107,3 +108,27 @@ STATIC_URL = "static/"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {
+            "format": "[{levelname}] {name}: {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "apps.infra.auth": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

@@ -26,11 +26,11 @@ class RegisterUserByInviteService:
         invite = get_object_or_404(UserInvite, token=dto.token)
 
         if not invite.is_valid():
-            raise AuthException("Convite inválido ou expirado")
+            raise AuthException("convite invalido ou expirado")
 
-        # 🔥 valida se o email bate com o convite
+        #  valida se o email bate com o convite
         if invite.email.strip().lower() != dto.email:
-            raise AuthException("Email não corresponde ao convite")
+            raise AuthException("email nao corresponde ao convite")
 
         ensure_user_does_not_exist(dto.email)
 
