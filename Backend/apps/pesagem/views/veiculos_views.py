@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from apps.pesagem.dto.veiculo_dto import VeiculoListDTO
-from apps.pesagem.service.veiculo import VeiculoServiceList
+from apps.pesagem.service.veiculo_service import VeiculoServiceList
 
 
 class VeiculoListApiView(APIView):
