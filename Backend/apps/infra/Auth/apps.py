@@ -7,4 +7,5 @@ class AuthConfig(AppConfig):
 
     def ready(self):
         from apps.infra.auth.models.custom_user import CustomUser
+        from apps.infra.auth.permissions import signals 
 
