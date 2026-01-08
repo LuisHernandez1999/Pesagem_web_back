@@ -3,7 +3,6 @@ class AuthException(Exception):
     default_detail = "Erro de autenticação"
 
     def __init__(self, detail: str = None):
-        # Se passar uma mensagem personalizada, usa ela; senão usa default
         self.detail = detail or self.default_detail
         super().__init__(self.detail)
 

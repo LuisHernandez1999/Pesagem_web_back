@@ -17,7 +17,8 @@ ALLOWED_HOSTS: list[str] = []
 
 INSTALLED_APPS = [
     "apps.infra.auth.apps.AuthConfig",  # Movido para o topo para garantir que o modelo de usuário customizado seja carregado primeiro
-
+    "rest_framework_simplejwt",
+    "corsheaders",
     # Django
     "django.contrib.admin",
     "django.contrib.auth",
@@ -66,6 +67,10 @@ DATABASES = {
     }
 }
 
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # 🔐 Custom User
 AUTH_USER_MODEL = "custom_auth.CustomUser"

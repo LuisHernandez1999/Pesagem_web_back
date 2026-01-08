@@ -5,3 +5,11 @@ from dataclasses import dataclass
 class RegisterUserDTO:
     email: str
     password: str
+
+
+
+@dataclass
+class RegisterByInviteDTO:
+    token: str
+    email: str
+    password: str
