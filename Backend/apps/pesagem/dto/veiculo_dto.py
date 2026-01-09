@@ -1,22 +1,41 @@
 from dataclasses import dataclass
+from typing import Optional
 from rest_framework.request import Request
+
+
+@dataclass(frozen=True, slots=True)
+class CreateVeiculoDTO:
+    prefixo: str
+    tipo: str
+    placa_veiculo: Optional[str]
+    em_manutencao: str
+    tipo_servico: str
+    equipamento: str
 
 
 @dataclass(slots=True)
 class VeiculoListDTO:
-    cursor: int | None
-    limit: int
-    search: str | None
+    cursor: Optional[int]
+    search: Optional[str]
     ordering: str
+    limit: int = 20
+    @classmethod
+    def from_request(cls, request) -> "VeiculoListDTO":
+        query = request.query_params
+        return cls(
+            cursor=int(query.get("cursor")) if query.get("cursor") else None,
+            search=query.get("search"),
+            ordering=query.get("ordering", "id"),
+            limit=int(query.get("limit", 20)),
+        )
+
+class VeiculoContagemTipoDTO:
+    tipo_servico: str
     @staticmethod
-    def from_request(request: Request) -> "VeiculoListDTO":
-        return VeiculoListDTO(
-            cursor=(
-                int(request.query_params.get("cursor"))
-                if request.query_params.get("cursor")
-                else None
-            ),
-            limit=int(request.query_params.get("limit", 50)),
-            search=request.query_params.get("search"),
-            ordering=request.query_params.get("ordering", "-prefixo"),
+    def from_request(request: Request) -> "VeiculoContagemTipoDTO":
+        tipo_servico = request.query_params.get("tipo_servico")
+        if not tipo_servico:
+            raise ValueError("tipo_servico é obrigatório")
+        return VeiculoContagemTipoDTO(
+            tipo_servico=tipo_servico
         )
