@@ -22,6 +22,7 @@ from django.urls import path
 from apps.infra.auth.views.generate_invite_view import GenerateInviteAPIView
 from apps.infra.auth.views.register_views import RegisterByInviteAPIView
 from apps.pesagem.views.veiculos_views import VeiculoListApiView,VeiculoCreateApiView
+from apps.pesagem.views.colaborador_views import ColaboradorCreateApiView,ColaboradorListApiView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -30,5 +31,7 @@ urlpatterns = [
     path("api/invite/", GenerateInviteAPIView.as_view(),name="Invite"),
     path("api/register-by-invite/", RegisterByInviteAPIView.as_view(),name="InviteRegister"),
     path("api/veiculos-list/",VeiculoListApiView.as_view(),name="VeiculosList"),
-    path("api/veiculo-create/",VeiculoCreateApiView.as_view(),name="VeiculoCreate")
+    path("api/veiculo-create/",VeiculoCreateApiView.as_view(),name="VeiculoCreate"),
+    path("api/create-colaborador/",ColaboradorCreateApiView.as_view(),name="ColaboradorCreate"),
+    path("api/colaborador-list/",ColaboradorListApiView.as_view(),name="ColaboradorList")
 ]
