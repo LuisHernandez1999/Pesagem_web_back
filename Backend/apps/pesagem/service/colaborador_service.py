@@ -23,7 +23,7 @@ class ColaboradorServiceCreate:
 class ColaboradorServiceList:
     @staticmethod
     def listar(dto: ColaboradorListDTO):
-        cache_key = f"colaborador:{dto.cursor}:{dto.limit}:{dto.funcao}:{dto.turno}"
+        cache_key = f"colaborador:{dto.cursor}:{dto.limit}:{dto.funcao}:{dto.turno}:{dto.ordering}"
 
         cached = get_cache(cache_key)
         if cached:
@@ -34,6 +34,7 @@ class ColaboradorServiceList:
             limit=dto.limit + 1,
             funcao=dto.funcao,
             turno=dto.turno,
+            ordering=dto.ordering
         )
 
         next_cursor = None

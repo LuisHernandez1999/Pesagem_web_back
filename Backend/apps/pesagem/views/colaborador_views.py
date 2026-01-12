@@ -22,7 +22,7 @@ class ColaboradorCreateApiView(GenericAPIView):
 #### listagem com retorno http e seus recptivos codigo de erro 
 class ColaboradorListApiView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
-    queryset = Colaborador.objects.none()
+    queryset = Colaborador.objects.all()
     def get(self, request):
         dto = ColaboradorListDTO.from_request(request)
         data = ColaboradorServiceList.listar(dto)

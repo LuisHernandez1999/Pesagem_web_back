@@ -49,7 +49,16 @@ def validar_colaborador(dto):
         raise PaInvalido()
 
 
-def order_sql_colaborador(ordering: str | None):
-    if ordering not in ALLOWED_ORDER_FIELDS:
-        return "turno"
-    return ordering
+def order_sql_colaborador(ordering: str):
+    allowed = {
+        "id": "id ASC",
+        "-id": "id DESC",
+        "nome": "nome ASC",
+        "-nome": "nome DESC",
+        "turno": "turno ASC",
+        "-turno": "turno DESC",
+        "funcao": "funcao ASC",
+        "-funcao": "funcao DESC",
+    }
+
+    return allowed.get(ordering, "id DESC")
