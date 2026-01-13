@@ -1,9 +1,6 @@
-from apps.pesagem.utils.pesagem_utils import order_sql_pesagem
 from django.db import connection
-from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO
-from apps.pesagem.utils.pesagem_utils import calcular_peso
-from apps.pesagem.models import Pesagem, Colaborador, Veiculo, Cooperativa
-from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO
+from apps.pesagem.models import Pesagem, Colaborador 
+
 
 def calcular_peso(prefixo_id, volume_carga):
     if not prefixo_id or not volume_carga:
@@ -39,82 +36,147 @@ class PesagemMapperCreate:
 
     
 #### pesagem listar mapper
+
 class PesagemListMapper:
+
     @staticmethod
-    def listar(dto):
-        where = []
+    def list(dto):
+        sql = """
+        SELECT
+            p.id,
+            p.data,
+            p.tipo_pesagem,
+            p.volume_carga,
+            p.numero_doc,
+            p.peso_calculado,
+            p.responsavel_coop,
+            p.garagem,
+            p.turno,
+            v.prefixo AS prefixo,
+            m.nome AS motorista,
+            c.nome AS cooperativa
+        FROM pesagem p
+        INNER JOIN veiculo v ON v.id = p.prefixo_id
+        INNER JOIN colaborador m ON m.id = p.motorista_id
+        INNER JOIN cooperativa c ON c.id = p.cooperativa_id
+        WHERE 1=1
+        """
+
         params = []
 
         if dto.start_date:
-            where.append("p.data >= %s")
+            sql += " AND p.data >= %s"
             params.append(dto.start_date)
 
         if dto.end_date:
-            where.append("p.data <= %s")
+            sql += " AND p.data <= %s"
             params.append(dto.end_date)
 
+        if dto.prefixo:
+            sql += " AND v.prefixo LIKE %s"
+            params.append(f"{dto.prefixo}%")
+
+        if dto.motorista:
+            sql += " AND m.nome LIKE %s"
+            params.append(f"%{dto.motorista}%")
+
         if dto.tipo_pesagem:
-            where.append("p.tipo_pesagem = %s")
+            sql += " AND p.tipo_pesagem = %s"
             params.append(dto.tipo_pesagem)
 
-        if dto.cursor is not None:
-            where.append("p.id < %s")
-            params.append(dto.cursor)
+        if dto.volume_carga:
+            sql += " AND p.volume_carga = %s"
+            params.append(dto.volume_carga)
 
-        where_sql = " AND ".join(where)
-        where_sql = f"AND {where_sql}" if where_sql else ""
+        if dto.cooperativa:
+            sql += " AND c.nome = %s"
+            params.append(dto.cooperativa)
 
-        sql = f"""
-            SELECT
-                p.id, p.data, p.tipo_pesagem, p.peso_calculado
-            FROM pesagem p
-            WHERE 1=1
-            {where_sql}
-            ORDER BY {order_sql_pesagem(dto.ordering)}
-            LIMIT %s
-        """
+        if dto.numero_doc:
+            sql += " AND p.numero_doc LIKE %s"
+            params.append(f"{dto.numero_doc}%")
 
+        if dto.responsavel_coop:
+            sql += " AND p.responsavel_coop LIKE %s"
+            params.append(f"%{dto.responsavel_coop}%")
+
+        if dto.garagem:
+            sql += " AND p.garagem = %s"
+            params.append(dto.garagem)
+
+        if dto.turno:
+            sql += " AND p.turno = %s"
+            params.append(dto.turno)
+
+        # cursor pagination
+        if dto.cursor_id:
+            sql += " AND p.id < %s"
+            params.append(dto.cursor_id)
+
+        sql += " ORDER BY p.id DESC LIMIT %s"
         params.append(dto.limit + 1)
 
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
             rows = cursor.fetchall()
+            columns = [c[0] for c in cursor.description]
 
-        columns = ("id", "data", "tipo_pesagem", "peso_calculado")
-        return [dict(zip(columns, r)) for r in rows]
+        results = [dict(zip(columns, r)) for r in rows]
 
+        next_cursor = None
+        if len(results) > dto.limit:
+            next_cursor = results[-1]["id"]
+            results = results[:-1]
+
+        return results, next_cursor
+
+
+
+class ExibirPesagemPorMesMapper:
     @staticmethod
-    def totais(dto):
-        where = []
+    def fetch(dto):
+        sql = """
+        SELECT
+            strftime('%Y', p.data) AS ano,
+            strftime('%m', p.data) AS mes_referencia,
+            p.tipo_pesagem,
+            COUNT(p.id) AS quantidade_pesagens,
+            ROUND(SUM(COALESCE(p.peso_calculado, 0)), 2) AS peso_total
+        FROM pesagem p
+        WHERE
+            p.data IS NOT NULL
+            AND p.tipo_pesagem IS NOT NULL
+        """
+
         params = []
 
         if dto.start_date:
-            where.append("data >= %s")
+            sql += " AND p.data >= %s"
             params.append(dto.start_date)
 
         if dto.end_date:
-            where.append("data <= %s")
+            sql += " AND p.data <= %s"
             params.append(dto.end_date)
 
-        where_sql = " AND ".join(where)
-        where_sql = f"WHERE {where_sql}" if where_sql else ""
+        if dto.tipo_pesagem:
+            sql += " AND p.tipo_pesagem = %s"
+            params.append(dto.tipo_pesagem)
 
-        sql = f"""
-            SELECT
-                COUNT(*) as total_pesagens,
-                COALESCE(SUM(peso_calculado), 0) as total_peso
-            FROM pesagem
-            {where_sql}
+        sql += """
+        GROUP BY
+            ano,
+            mes_referencia,
+            p.tipo_pesagem
+        ORDER BY
+            ano DESC,
+            mes_referencia DESC
         """
 
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
-            row = cursor.fetchone()
-
-        return {
-            "total_pesagens_all": row[0],
-            "total_peso_all": float(row[1]),
-        }
+            rows = cursor.fetchall()
+            columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in rows]
 
 ### retorna quantidade catatreco e seletiva
 class PesagemTipoServicoMapper:

@@ -19,22 +19,25 @@ class CreatePesagemDTO:
     turno: str
 
 
-@dataclass(slots=True)
+@dataclass
 class PesagemListDTO:
-    cursor: Optional[int]
-    limit: 20
-    start_date: Optional[str]
-    end_date: Optional[str]
-    tipo_pesagem: Optional[str]
-    ordering: str = "id"
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    prefixo: Optional[str] = None
+    motorista: Optional[str] = None
+    volume_carga: Optional[str] = None
+    cooperativa: Optional[str] = None
+    numero_doc: Optional[str] = None
+    responsavel_coop: Optional[str] = None
+    tipo_pesagem: Optional[str] = None
+    garagem: Optional[str] = None
+    turno: Optional[str] = None
+    limit: int = 20
+    cursor_id: Optional[int] = None
 
-    @staticmethod
-    def from_request(request: Request) -> "PesagemListDTO":
-        return PesagemListDTO(
-            cursor=int(request.query_params.get("cursor")) if request.query_params.get("cursor") else None,
-            limit=min(int(request.query_params.get("limit", 20)), 100),
-            start_date=request.query_params.get("start_date"),
-            end_date=request.query_params.get("end_date"),
-            tipo_pesagem=request.query_params.get("tipo_pesagem"),
-            ordering=request.query_params.get("ordering") or "id",
-        )
+
+@dataclass
+class ExibirPesagemPorMesDTO:
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    tipo_pesagem: Optional[str] = None

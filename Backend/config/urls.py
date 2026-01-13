@@ -24,7 +24,7 @@ from apps.infra.auth.views.register_views import RegisterByInviteAPIView
 from apps.pesagem.views.veiculos_views import VeiculoListApiView,VeiculoCreateApiView
 from apps.pesagem.views.cooperativa_views import CooperativaCreateAPIView
 from apps.pesagem.views.colaborador_views import ColaboradorCreateApiView,ColaboradorListApiView
-from apps.pesagem.views.pesagem_views import PesagemCreateApiView,PesagemListApiView,PesagemTipoServicoView
+from apps.pesagem.views.pesagem_views import PesagemCreateApiView,PesagemTipoServicoView,PesagemListApiView,ExibirPesagemPorMesAPIView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -39,5 +39,6 @@ urlpatterns = [
     path("api/create-cooperativa/",CooperativaCreateAPIView.as_view(),name="CooperativaCreate"),
     path("api/create-pesagem/",PesagemCreateApiView.as_view(),name="CreatePesagem"),
     path("api/pesagem-list/",PesagemListApiView.as_view(),name="PesagemList"),
+    path("api/pesagem-list-por-mes/",ExibirPesagemPorMesAPIView.as_view(),name="PesagemListPorMes"),
     path("api/pesagem-tipo_servico/",PesagemTipoServicoView.as_view(),name="PesagemList")
 ]

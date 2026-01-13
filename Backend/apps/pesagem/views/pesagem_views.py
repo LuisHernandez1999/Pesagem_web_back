@@ -1,15 +1,11 @@
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
-from apps.pesagem.dto.pesagem_dto import PesagemListDTO
-from apps.pesagem.service.pesagem_service import PesagemServiceList
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
-from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO
-from apps.pesagem.service.pesagem_service import PesagemServiceCreate,PesagemServiceListTipo, PesagemServiceList
+from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO,PesagemListDTO,ExibirPesagemPorMesDTO 
+from apps.pesagem.service.pesagem_service import PesagemServiceCreate,PesagemServiceListTipo, PesagemListService,ExibirPesagemPorMesService
 from apps.pesagem.exceptions.pesagem_execptions import PesagemException
 from apps.pesagem.models.pesagem import Pesagem
 from rest_framework import status
@@ -34,17 +30,45 @@ class PesagemCreateApiView(GenericAPIView):
                 status=e.status_code
             )
 
-class PesagemListApiView(APIView):
+class PesagemListApiView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
-    queryset = Pesagem.objects.all()
-
+    queryset = Pesagem.objects.none()
     def get(self, request):
-        dto = PesagemListDTO.from_request(request)
-        data = PesagemServiceList.listar(dto)
-        return Response(data, status=200)
+        dto = PesagemListDTO(
+            start_date=request.GET.get("start_date"),
+            end_date=request.GET.get("end_date"),
+            prefixo=request.GET.get("prefixo"),
+            motorista=request.GET.get("motorista"),
+            volume_carga=request.GET.get("volume_carga"),
+            cooperativa=request.GET.get("cooperativa"),
+            numero_doc=request.GET.get("numero_doc"),
+            responsavel_coop=request.GET.get("responsavel_coop"),
+            tipo_pesagem=request.GET.get("tipo_pesagem"),
+            garagem=request.GET.get("garagem"),
+            turno=request.GET.get("turno"),
+            limit=int(request.GET.get("limit", 20)),
+            cursor_id=request.GET.get("cursor"),
+        )
+        result = PesagemListService.execute(dto)
+        return Response(result)
+    
+
+class ExibirPesagemPorMesAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    queryset = Pesagem.objects.none()
+    def get(self, request):
+        dto = ExibirPesagemPorMesDTO(
+            start_date=request.GET.get("start_date"),
+            end_date=request.GET.get("end_date"),
+            tipo_pesagem=request.GET.get("tipo_pesagem"),
+        )
+        result = ExibirPesagemPorMesService.execute(dto)
+        return Response(result, status=200)
 
 
-class PesagemTipoServicoView(APIView):
+class PesagemTipoServicoView(GenericAPIView):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    queryset = Pesagem.objects.none()
     def get(self, request):
         try:
             total_seletiva = PesagemServiceListTipo.total_seletiva()

@@ -1,6 +1,6 @@
 from django.db import transaction
 from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO
-from apps.pesagem.mappers.pesagem_mappers import PesagemMapperCreate,PesagemListMapper,PesagemTipoServicoMapper
+from apps.pesagem.mappers.pesagem_mappers import PesagemMapperCreate,PesagemListMapper,PesagemTipoServicoMapper,ExibirPesagemPorMesMapper
 from apps.pesagem.utils.pesagem_utils import validar_pesagem
 
 class PesagemServiceCreate:
@@ -9,30 +9,29 @@ class PesagemServiceCreate:
     def create(dto: CreatePesagemDTO) -> int:
         # Valida dados da pesagem antes de criar
         validar_pesagem(dto)
-
         # Cria a pesagem e vincula colaboradores diretamente no mapper
         pesagem_id = PesagemMapperCreate.insert(dto)
-
         # Removida a chamada para vincular_colaboradores inexistente
         return pesagem_id
     
 
-class PesagemServiceList:
+class PesagemListService:
     @staticmethod
-    def listar(dto):
-        rows = PesagemListMapper.listar(dto)
-
-        next_cursor = None
-        if len(rows) > dto.limit:
-            next_cursor = rows[-1]["id"]
-            rows = rows[:-1]
-
-        totais = PesagemListMapper.totais(dto)
-
+    def execute(dto):
+        rows, next_cursor = PesagemListMapper.list(dto)
         return {
             "results": rows,
             "next_cursor": next_cursor,
-            **totais,
+            
+        }
+
+class ExibirPesagemPorMesService:
+    @staticmethod
+    def execute(dto):
+        data = ExibirPesagemPorMesMapper.fetch(dto)
+
+        return {
+            "pesagens_por_periodo_personalizado": data
         }
 
 

@@ -4,7 +4,24 @@ from apps.pesagem.exceptions.pesagem_execptions import (
     VolumeCargaInvalido,
 )
 from apps.pesagem.models.pesagem import Pesagem
-from django.db import connection
+from datetime import date
+
+def gerar_numero_doc_pesagem():
+    hoje = date.today().strftime("%Y%m%d")
+
+    sql = """
+        SELECT COUNT(*)
+        FROM pesagem
+        WHERE data = %s
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql, [date.today()])
+        total_hoje = cursor.fetchone()[0]
+
+    sequencial = total_hoje + 1
+
+    return f"{hoje}-{sequencial:04d}"
 
 def order_sql_pesagem(ordering: str) -> str:
     allowed = {
@@ -26,7 +43,6 @@ def calcular_peso(prefixo_id: int, volume_carga: str) -> float:
 
     if not row:
         return 0
-
     tipo_veiculo = row[0]
     return Pesagem.VOLUMES_CARGA.get(tipo_veiculo, {}).get(volume_carga, 0)
 
