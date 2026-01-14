@@ -1,0 +1,1 @@
+from .cooperativa import Cooperativa

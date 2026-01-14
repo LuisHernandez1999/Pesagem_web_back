@@ -21,9 +21,9 @@ from apps.infra.auth.views.register_views import RegisterUserAPIView
 from django.urls import path
 from apps.infra.auth.views.generate_invite_view import GenerateInviteAPIView
 from apps.infra.auth.views.register_views import RegisterByInviteAPIView
-from apps.pesagem.views.veiculos_views import VeiculoListApiView,VeiculoCreateApiView
-from apps.pesagem.views.cooperativa_views import CooperativaCreateAPIView
-from apps.pesagem.views.colaborador_views import ColaboradorCreateApiView,ColaboradorListApiView
+from apps.veiculo.views.veiculos_views import VeiculoListApiView,VeiculoCreateApiView
+from apps.cooperativa.views.cooperativa_views import CooperativaCreateAPIView
+from apps.colaborador.views.colaborador_views import ColaboradorCreateApiView,ColaboradorListApiView
 from apps.pesagem.views.pesagem_views import PesagemCreateApiView,PesagemTipoServicoView,PesagemListApiView,ExibirPesagemPorMesAPIView
 
 urlpatterns = [

@@ -1,5 +1,6 @@
 from django.db import connection
-from apps.pesagem.models import Pesagem, Colaborador 
+from apps.pesagem.models import Pesagem
+from apps.colaborador.models import Colaborador
 
 
 def calcular_peso(prefixo_id, volume_carga):

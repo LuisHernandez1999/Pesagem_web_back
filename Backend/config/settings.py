@@ -18,6 +18,9 @@ ALLOWED_HOSTS: list[str] = []
 
 INSTALLED_APPS = [
     "apps.infra.auth.apps.AuthConfig",  # Movido para o topo para garantir que o modelo de usuário customizado seja carregado primeiro
+    "apps.veiculo.apps.VeiculoConfig",
+    "apps.colaborador.apps.ColaboradorConfig",
+    "apps.cooperativa.apps.CooperativaConfig",
     "apps.pesagem.apps.PesagemConfig",
     "rest_framework_simplejwt",
     "corsheaders",
