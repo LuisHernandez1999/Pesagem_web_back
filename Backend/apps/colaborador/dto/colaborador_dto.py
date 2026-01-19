@@ -15,10 +15,11 @@ class CreateColaboradorDTO:
 
 @dataclass(slots=True)
 class ColaboradorListDTO:
-    cursor: int | None
+    cursor: int 
     limit: 20
     funcao: Optional[str]
     turno: Optional[str]
+    pa:Optional[str]
     ordering:Optional [str]
 
     @staticmethod
@@ -32,5 +33,9 @@ class ColaboradorListDTO:
         limit=min(int(request.query_params.get("limit", 20)), 100),
         funcao=request.query_params.get("funcao"),
         turno=request.query_params.get("turno"),
+        pa=request.query_params.get("pa"),
         ordering=request.query_params.get("ordering") or "id",
     )
+
+
+

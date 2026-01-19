@@ -1,19 +1,19 @@
-from apps.veiculo.dto.veiculo_dto import VeiculoListDTO,CreateVeiculoDTO,VeiculoContagemTipoDTO
-from apps.veiculo.mappers.veiculos_mappers import VeiculoMapperList,VeiculoMapperCreate,VeiculosMapperTipo
+from apps.veiculo.dto.veiculo_dto import VeiculoListDTO,CreateVeiculoDTO,VeiculoContagemTipoDTO,VeiculoRankingDTO
+from apps.veiculo.mappers.veiculos_mappers import VeiculoMapperList,VeiculoMapperCreate,VeiculosMapperTipo,RankingVeiculosPesagemMapper
 from apps.pesagem.utils.cache_utils import get_cache, set_cache
+from apps.veiculo.utils.veiculos_utils import validar_veiculo
 from django.db import  transaction
+
+
 
 ##### cadastro de veiculos
 class VeiculoServiceCreate:
     @staticmethod
     @transaction.atomic
     def create(dto: CreateVeiculoDTO) -> int:
-        if VeiculoMapperCreate.exists_by_prefixo(dto.prefixo):
-            raise ValueError("Prefixo já cadastrado")
-        if VeiculoMapperCreate.exists_by_placa(dto.placa_veiculo):
-            raise ValueError("Placa já cadastrada")
-        return VeiculoMapperCreate.insert(dto)
-
+        validar_veiculo(dto)
+        return VeiculoMapperCreate
+        
 
 class VeiculoServiceList:
     @staticmethod
@@ -73,3 +73,11 @@ class VeiculoServiceContagem:
 
         set_cache(cache_key, result, timeout=120)
         return result
+    
+
+
+
+class VeiculoRankingService:
+    @staticmethod
+    def get(dto: VeiculoRankingDTO) -> int:
+        return RankingVeiculosPesagemMapper.get(dto)

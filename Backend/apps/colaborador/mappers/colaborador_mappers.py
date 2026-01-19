@@ -1,4 +1,4 @@
-from apps.colaborador.dto.colaborador_dto import CreateColaboradorDTO
+from apps.colaborador.dto.colaborador_dto import CreateColaboradorDTO,ColaboradorListDTO
 from apps.colaborador.utils.colaborador_utils import fetch_one
 from django.db import connection
 from apps.colaborador.utils.colaborador_utils import filtro_funcao_turno_sql,order_sql_colaborador
@@ -31,29 +31,29 @@ class ColaboradorMapperCreate:
     
 class ColaboradorMapperList:
     @staticmethod
-    def listar(cursor, limit, funcao, turno,ordering):
-        filtro_sql, filtro_params = filtro_funcao_turno_sql(funcao, turno)
+    def listar(cursor, limit, funcao, turno, ordering, pa, dto: ColaboradorListDTO):
+        filtro_sql, filtro_params = filtro_funcao_turno_sql(funcao, turno, pa)
         ordering_clause = order_sql_colaborador(ordering)
         cursor_sql = ""
         cursor_params = []
         if cursor:
-            cursor_sql = "AND id < %s"
+            cursor_sql = "AND c.id < %s"
             cursor_params.append(cursor)
 
         sql = f"""
             SELECT
-                id,
-                nome,
-                matricula,
-                funcao,
-                turno,
-                status,
-                pa
-            FROM colaborador
+                c.id,
+                c.nome,
+                c.matricula,
+                c.funcao,
+                c.turno,
+                c.status,
+                c.pa
+            FROM colaborador c
             WHERE 1=1
             {filtro_sql}
             {cursor_sql}
-            ORDER BY {ordering_clause}, id DESC
+            ORDER BY {ordering_clause}, c.id DESC
             LIMIT %s
         """
 
@@ -77,4 +77,7 @@ class ColaboradorMapperList:
             "pa",
         )
 
-        return [dict(zip(columns, row)) for row in rows]
+        return [
+            dict(zip(columns, row))
+            for row in rows
+        ]

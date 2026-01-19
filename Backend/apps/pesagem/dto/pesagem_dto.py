@@ -5,18 +5,19 @@ from typing import List, Optional
 @dataclass(frozen=True)
 class CreatePesagemDTO:
     data: str
-    prefixo_id: int
-    colaborador_ids: List[int]
-    cooperativa_id: int
+    prefixo: str                    
+    colaboradores: List[str]         
+    cooperativa: str                 
     responsavel_coop: Optional[str]
-    motorista_id: int
+    motorista: str   
+    peso_calculado: str                  
     hora_chegada: str
     hora_saida: str
     numero_doc: str
-    volume_carga: str
-    tipo_pesagem: str
-    garagem: str
-    turno: str
+    volume_carga: str                
+    tipo_pesagem: str                
+    garagem: str                     
+    turno: str 
 
 
 @dataclass
@@ -33,7 +34,8 @@ class PesagemListDTO:
     garagem: Optional[str] = None
     turno: Optional[str] = None
     limit: int = 20
-    cursor_id: Optional[int] = None
+    cursor_id: int = None
+
 
 
 @dataclass

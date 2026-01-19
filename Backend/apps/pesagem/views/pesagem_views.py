@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
 from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO,PesagemListDTO,ExibirPesagemPorMesDTO 
-from apps.pesagem.service.pesagem_service import PesagemServiceCreate,PesagemServiceListTipo, PesagemListService,ExibirPesagemPorMesService
+from apps.pesagem.service.pesagem_service import PesagemServiceCreate,PesagemServiceListTipo, PesagemListService,ExibirPesagemPorMesService,PesagemTotalService
 from apps.pesagem.exceptions.pesagem_execptions import PesagemException
 from apps.pesagem.models.pesagem import Pesagem
 from rest_framework import status
@@ -51,6 +51,8 @@ class PesagemListApiView(GenericAPIView):
         )
         result = PesagemListService.execute(dto)
         return Response(result)
+
+   
     
 
 class ExibirPesagemPorMesAPIView(GenericAPIView):
@@ -64,6 +66,29 @@ class ExibirPesagemPorMesAPIView(GenericAPIView):
         )
         result = ExibirPesagemPorMesService.execute(dto)
         return Response(result, status=200)
+
+
+
+class PesagemTotalAPIView(GenericAPIView):
+    permission_classes=[IsAuthenticated,DjangoModelPermissionsWithView]
+    queryset=Pesagem.objects.none()
+    def get(self,request):
+        try:
+            total_pesagem= PesagemTotalService.total_pesagem()
+
+            return Response(
+                {
+                    "Total_pesagem": total_pesagem
+                }
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+
 
 
 class PesagemTipoServicoView(GenericAPIView):
@@ -86,3 +111,5 @@ class PesagemTipoServicoView(GenericAPIView):
                 {"detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+        
+

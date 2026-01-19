@@ -2,13 +2,13 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from apps.cooperativa.dto.cooperativa_dto import CreateCooperativaDTO
-from apps.cooperativa.services.cooperativa_services import CreateCooperativaService
+from apps.cooperativa.dto.cooperativa_dto import CreateCooperativaDTO,CooperativaEficienciaDTO
+from apps.cooperativa.services.cooperativa_services import CreateCooperativaService,CooperativaEfcinenciaService
 from apps.cooperativa.excepetions.cooperativa_exceptions import CooperativaException
 from apps.cooperativa.models.cooperativa import Cooperativa
 from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
 
-
+#### criar cooperativa
 class CooperativaCreateAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
     queryset = Cooperativa.objects.none()
@@ -34,3 +34,23 @@ class CooperativaCreateAPIView(GenericAPIView):
                 {"detail": e.detail},
                 status=e.status_code,
             )
+
+
+
+#listar por ranking de pesagens-//// cooperativas
+class EficienciaCooperativaRankingAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    queryset = Cooperativa.objects.none()
+
+    def get(self, request):
+        dto = CooperativaEficienciaDTO(
+            nome=request.query_params.get("nome")
+        )
+
+        ranking = CooperativaEfcinenciaService.get(dto)
+        return Response(
+            {
+                "cooperativa_ranking": ranking
+            },
+            status=status.HTTP_200_OK
+        )

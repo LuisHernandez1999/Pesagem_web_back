@@ -21,10 +21,13 @@ from apps.infra.auth.views.register_views import RegisterUserAPIView
 from django.urls import path
 from apps.infra.auth.views.generate_invite_view import GenerateInviteAPIView
 from apps.infra.auth.views.register_views import RegisterByInviteAPIView
-from apps.veiculo.views.veiculos_views import VeiculoListApiView,VeiculoCreateApiView
-from apps.cooperativa.views.cooperativa_views import CooperativaCreateAPIView
+from apps.veiculo.views.veiculos_views import VeiculoListApiView,VeiculoCreateApiView,VeiculoRankingPesagemApiView
+from apps.cooperativa.views.cooperativa_views import CooperativaCreateAPIView,EficienciaCooperativaRankingAPIView
 from apps.colaborador.views.colaborador_views import ColaboradorCreateApiView,ColaboradorListApiView
-from apps.pesagem.views.pesagem_views import PesagemCreateApiView,PesagemTipoServicoView,PesagemListApiView,ExibirPesagemPorMesAPIView
+from apps.pesagem.views.pesagem_views import (PesagemCreateApiView,
+                                              PesagemTipoServicoView,PesagemListApiView
+                                              ,ExibirPesagemPorMesAPIView
+                                              ,PesagemTotalAPIView)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -36,9 +39,14 @@ urlpatterns = [
     path("api/veiculo-create/",VeiculoCreateApiView.as_view(),name="VeiculoCreate"),
     path("api/create-colaborador/",ColaboradorCreateApiView.as_view(),name="ColaboradorCreate"),
     path("api/colaborador-list/",ColaboradorListApiView.as_view(),name="ColaboradorList"),
+    path("api/veiculo-ranking/",VeiculoRankingPesagemApiView.as_view(),name="RankingVeiculosPesagem"),
     path("api/create-cooperativa/",CooperativaCreateAPIView.as_view(),name="CooperativaCreate"),
+    path("api/cooperativa-ranking/", EficienciaCooperativaRankingAPIView.as_view(), name="CooperativaRanking"),
     path("api/create-pesagem/",PesagemCreateApiView.as_view(),name="CreatePesagem"),
     path("api/pesagem-list/",PesagemListApiView.as_view(),name="PesagemList"),
     path("api/pesagem-list-por-mes/",ExibirPesagemPorMesAPIView.as_view(),name="PesagemListPorMes"),
-    path("api/pesagem-tipo_servico/",PesagemTipoServicoView.as_view(),name="PesagemList")
+    path("api/pesagem-tipo_servico/",PesagemTipoServicoView.as_view(),name="PesagemList"),
+    path("api/pesagem-total/",PesagemTotalAPIView.as_view(),name="PesagemTotal"),
+
+
 ]

@@ -1,17 +1,14 @@
 from django.db import transaction
 from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO
-from apps.pesagem.mappers.pesagem_mappers import PesagemMapperCreate,PesagemListMapper,PesagemTipoServicoMapper,ExibirPesagemPorMesMapper
+from apps.pesagem.mappers.pesagem_mappers import PesagemMapperCreate,PesagemListMapper,PesagemTipoServicoMapper,ExibirPesagemPorMesMapper,PesagemQuantidadeMapper
 from apps.pesagem.utils.pesagem_utils import validar_pesagem
 
 class PesagemServiceCreate:
     @staticmethod
     @transaction.atomic
     def create(dto: CreatePesagemDTO) -> int:
-        # Valida dados da pesagem antes de criar
         validar_pesagem(dto)
-        # Cria a pesagem e vincula colaboradores diretamente no mapper
         pesagem_id = PesagemMapperCreate.insert(dto)
-        # Removida a chamada para vincular_colaboradores inexistente
         return pesagem_id
     
 
@@ -35,11 +32,18 @@ class ExibirPesagemPorMesService:
         }
 
 
+class PesagemTotalService:
+    @staticmethod
+    def total_pesagem() -> int:
+        return PesagemQuantidadeMapper
+    
+
+
 class PesagemServiceListTipo:
     @staticmethod
     def total_seletiva() -> int:
         return PesagemTipoServicoMapper.total("SELETIVA")
-
     @staticmethod
     def total_cata_treco() -> int:
         return PesagemTipoServicoMapper.total("CATA-TRECO")
+
