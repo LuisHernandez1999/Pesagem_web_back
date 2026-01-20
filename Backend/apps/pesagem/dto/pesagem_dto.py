@@ -43,3 +43,21 @@ class ExibirPesagemPorMesDTO:
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     tipo_pesagem: Optional[str] = None
+
+
+
+
+
+@dataclass
+class PesagemCreateDocDTO:
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    prefixo: Optional[str] = None
+    motorista: Optional[str] = None
+    volume_carga: Optional[str] = None
+    cooperativa: Optional[str] = None
+    numero_doc: Optional[str] = None
+    responsavel_coop: Optional[str] = None
+    tipo_pesagem: Optional[str] = None
+    garagem: Optional[str] = None
+    turno: Optional[str] = None

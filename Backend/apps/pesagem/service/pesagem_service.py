@@ -1,7 +1,12 @@
 from django.db import transaction
-from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO
-from apps.pesagem.mappers.pesagem_mappers import PesagemMapperCreate,PesagemListMapper,PesagemTipoServicoMapper,ExibirPesagemPorMesMapper,PesagemQuantidadeMapper
 from apps.pesagem.utils.pesagem_utils import validar_pesagem
+from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO,PesagemListDTO,ExibirPesagemPorMesDTO,PesagemCreateDocDTO
+from apps.pesagem.mappers.pesagem_mappers import (PesagemMapperCreate,
+                                                  PesagemListMapper,PesagemTipoServicoMapper,
+                                                  ExibirPesagemPorMesMapper,
+                                                  PesagemQuantidadeMapper,
+                                                  PesagemGerarDocMapper)
+
 
 class PesagemServiceCreate:
     @staticmethod
@@ -14,7 +19,7 @@ class PesagemServiceCreate:
 
 class PesagemListService:
     @staticmethod
-    def execute(dto):
+    def execute(dto:PesagemListDTO):
         rows, next_cursor = PesagemListMapper.list(dto)
         return {
             "results": rows,
@@ -24,7 +29,7 @@ class PesagemListService:
 
 class ExibirPesagemPorMesService:
     @staticmethod
-    def execute(dto):
+    def execute(dto:ExibirPesagemPorMesDTO):
         data = ExibirPesagemPorMesMapper.fetch(dto)
 
         return {
@@ -46,4 +51,11 @@ class PesagemServiceListTipo:
     @staticmethod
     def total_cata_treco() -> int:
         return PesagemTipoServicoMapper.total("CATA-TRECO")
+    
+
+
+class PesagemServiceDoc:
+    @staticmethod
+    def executar(dto: PesagemCreateDocDTO) -> list[dict]:
+        return PesagemGerarDocMapper.get(dto)
 

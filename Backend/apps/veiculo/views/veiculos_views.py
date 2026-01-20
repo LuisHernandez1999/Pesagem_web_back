@@ -70,7 +70,12 @@ class VeiculoContagemTipoApiView(GenericAPIView):
             )
         
 
-class VeiculoRankingPesagemApiView:
+
+
+
+        
+
+class VeiculoRankingPesagemApiView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
     queryset = Veiculo.objects.none()
     def get(self, request):

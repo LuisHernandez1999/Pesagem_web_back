@@ -5,6 +5,7 @@ from apps.veiculo.models import Veiculo
 from apps.colaborador.models import Colaborador
 from apps.cooperativa.models import Cooperativa
 from django.db import transaction
+from apps.pesagem.utils.pesagem_utils import (buscar_colaborador_nome_matricula,buscar_nome_cooperativa,buscar_prefixo_veiculo)
 
 
 def calcular_peso(prefixo_id, volume_carga):
@@ -279,7 +280,6 @@ class PesagemFiltersMapper:
         # filtro especial para numero_doc 
         if filters.get("numero_doc"):
             val = filters["numero_doc"]
-            # numero_doc começa com valor, opcionalmente seguido de letra
             sql += " AND (p.numero_doc = %s OR p.numero_doc LIKE %s)"
             params.extend([val, f"{val}_"])
 
@@ -288,3 +288,71 @@ class PesagemFiltersMapper:
             # converte cada linha em dict
             columns = [col[0] for col in c.description]
             return [dict(zip(columns, row)) for row in c.fetchall()]
+        
+
+
+
+class PesagemGerarDocMapper:
+
+    @staticmethod
+    def get(dto):
+        sql = """
+        SELECT
+            p.id,
+            p.data,
+            -- MAP: prefixo (veiculo)
+            (
+                SELECT v.prefixo
+                FROM veiculo v
+                WHERE v.id = p.prefixo_id
+            ) AS prefixo,
+            -- MAP: cooperativa (nome)
+            (
+                SELECT c.nome
+                FROM cooperativa c
+                WHERE c.id = p.cooperativa_id
+            ) AS cooperativa,
+            -- MAP: colaborador (motorista -> nome + matricula)
+            (
+                SELECT col.nome || ' - ' || col.matricula
+                FROM colaborador col
+                WHERE col.id = p.motorista_id
+            ) AS motorista,
+            p.tipo_pesagem,
+            p.volume_carga,
+            p.turno,
+            p.garagem,
+            p.responsavel_coop,
+            p.hora_chegada,
+            p.hora_saida,
+            p.peso_calculado,
+            p.numero_doc
+
+        FROM pesagem p
+        WHERE 1=1
+        """
+
+        params = []
+
+        mapping = {
+            "start_date": ("AND p.data >= %s", lambda v: v),
+            "end_date": ("AND p.data <= %s", lambda v: v),
+            "tipo_pesagem": ("AND p.tipo_pesagem = %s", lambda v: v),
+            "volume_carga": ("AND p.volume_carga = %s", lambda v: v),
+            "turno": ("AND p.turno = %s", lambda v: v),
+            "garagem": ("AND p.garagem = %s", lambda v: v),
+        }
+
+        for field, (condition, transform) in mapping.items():
+            value = getattr(dto, field, None)
+            if value not in (None, "", []):
+                sql += f"\n{condition}"
+                params.append(transform(value))
+
+        sql += "\nORDER BY p.data DESC, p.id DESC"
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql, params)
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+        

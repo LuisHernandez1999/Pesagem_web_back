@@ -3,6 +3,7 @@ from typing import Optional
 from rest_framework.request import Request
 
 
+
 @dataclass(frozen=True, slots=True)
 class CreateVeiculoDTO:
     prefixo: str

@@ -6,6 +6,61 @@ from apps.pesagem.exceptions.pesagem_execptions import (
 from apps.pesagem.models.pesagem import Pesagem
 from datetime import date
 
+
+def buscar_prefixo_veiculo(prefixo_id: int) -> str | None:
+   
+    if not prefixo_id:
+        return None
+
+    sql = "SELECT prefixo FROM veiculo WHERE id = %s"
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql, [prefixo_id])
+        row = cursor.fetchone()
+
+    return row[0] if row else None
+
+
+def buscar_nome_cooperativa(cooperativa_id: int) -> str | None:
+    """
+    Retorna o nome da cooperativa a partir do ID
+    """
+    if not cooperativa_id:
+        return None
+
+    sql = "SELECT nome FROM cooperativa WHERE id = %s"
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql, [cooperativa_id])
+        row = cursor.fetchone()
+
+    return row[0] if row else None
+
+
+def buscar_colaborador_nome_matricula(colaborador_id: int) -> str | None:
+    if not colaborador_id:
+        return None
+
+    sql = """
+        SELECT nome, matricula
+        FROM colaborador
+        WHERE id = %s
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql, [colaborador_id])
+        row = cursor.fetchone()
+
+    if not row:
+        return None
+
+    nome, matricula = row
+    return f"{nome} - {matricula}" if matricula else nome
+
+
+
+
+
 def gerar_numero_doc_pesagem():
     hoje = date.today().strftime("%Y%m%d")
 
@@ -58,15 +113,3 @@ def validar_pesagem(dto):
 
 
 
-#### standart pagination
-
-##class StandardResultsSetPagination(PageNumberPagination):###
-  ####  permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView] ####
-   ## page_size = 100
-    ##page_size_query_param = 'page_size'##
-    ##max_page_size = 1000
-
-  ###  def get_paginated_response(self, data):
-      ##  if self.request.query_params.get('pagination', 'true') == 'false':
-        ####    return Response(data)
-    ####    return super().get_paginated_response(data)

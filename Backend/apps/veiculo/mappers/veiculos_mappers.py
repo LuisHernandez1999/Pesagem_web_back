@@ -196,6 +196,10 @@ class RankingVeiculosPesagemMapper:
             columns = [col[0] for col in db.description]
 
         return [dict(zip(columns, row)) for row in rows]
+    
+
+
+    
 
 
 
