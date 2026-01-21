@@ -4,7 +4,6 @@ from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO,PesagemListDTO,ExibirP
 from apps.pesagem.mappers.pesagem_mappers import (PesagemMapperCreate,
                                                   PesagemListMapper,PesagemTipoServicoMapper,
                                                   ExibirPesagemPorMesMapper,
-                                                  PesagemQuantidadeMapper,
                                                   PesagemGerarDocMapper)
 
 
@@ -37,10 +36,7 @@ class ExibirPesagemPorMesService:
         }
 
 
-class PesagemTotalService:
-    @staticmethod
-    def total_pesagem() -> int:
-        return PesagemQuantidadeMapper
+
     
 
 

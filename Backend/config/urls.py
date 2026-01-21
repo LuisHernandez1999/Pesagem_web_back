@@ -27,7 +27,6 @@ from apps.colaborador.views.colaborador_views import ColaboradorCreateApiView,Co
 from apps.pesagem.views.pesagem_views import (PesagemCreateApiView,
                                               PesagemTipoServicoView,PesagemListApiView
                                               ,ExibirPesagemPorMesAPIView
-                                              ,PesagemTotalAPIView
                                               ,PesagemGerarDocumentoAPIView)
 
 urlpatterns = [
@@ -40,15 +39,13 @@ urlpatterns = [
     path("api/veiculo-create/",VeiculoCreateApiView.as_view(),name="VeiculoCreate"),
     path("api/create-colaborador/",ColaboradorCreateApiView.as_view(),name="ColaboradorCreate"),
     path("api/colaborador-list/",ColaboradorListApiView.as_view(),name="ColaboradorList"),
-    path("api/veiculos-list/",VeiculoRankingPesagemApiView.as_view(),name=" VeiculoListRanking"),
+    path("api/veiculos-ranking/",VeiculoRankingPesagemApiView.as_view(),name=" VeiculoListRanking"),
     path("api/create-cooperativa/",CooperativaCreateAPIView.as_view(),name="CooperativaCreate"),
     path("api/cooperativa-ranking/", EficienciaCooperativaRankingAPIView.as_view(), name="CooperativaRanking"),
     path("api/create-pesagem/",PesagemCreateApiView.as_view(),name="CreatePesagem"),
     path("api/pesagem-list/",PesagemListApiView.as_view(),name="PesagemList"),
     path("api/pesagem-list-por-mes/",ExibirPesagemPorMesAPIView.as_view(),name="PesagemListPorMes"),
     path("api/pesagem-tipo_servico/",PesagemTipoServicoView.as_view(),name="PesagemList"),
-    path("api/pesagem-total/",PesagemTotalAPIView.as_view(),name="PesagemTotal"),
-    path("api/pesagem-excel/",PesagemGerarDocumentoAPIView.as_view(),name="PesagemExcel")
-
+    path("api/pesagem-excel/",PesagemGerarDocumentoAPIView.as_view(),name="PesagemExcel"),
 
 ]

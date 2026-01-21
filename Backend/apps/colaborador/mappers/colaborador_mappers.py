@@ -31,14 +31,20 @@ class ColaboradorMapperCreate:
     
 class ColaboradorMapperList:
     @staticmethod
-    def listar(cursor, limit, funcao, turno, ordering, pa, dto: ColaboradorListDTO):
-        filtro_sql, filtro_params = filtro_funcao_turno_sql(funcao, turno, pa)
-        ordering_clause = order_sql_colaborador(ordering)
+    def listar(dto: ColaboradorListDTO):
+        filtro_sql, filtro_params = filtro_funcao_turno_sql(
+            dto.funcao,
+            dto.turno,
+            dto.pa,
+        )
+
+        ordering_clause = order_sql_colaborador(dto.ordering)
+
         cursor_sql = ""
         cursor_params = []
-        if cursor:
+        if dto.cursor:
             cursor_sql = "AND c.id < %s"
-            cursor_params.append(cursor)
+            cursor_params.append(dto.cursor)
 
         sql = f"""
             SELECT
@@ -60,7 +66,7 @@ class ColaboradorMapperList:
         params = [
             *filtro_params,
             *cursor_params,
-            limit,
+            dto.limit,
         ]
 
         with connection.cursor() as db:
@@ -68,16 +74,8 @@ class ColaboradorMapperList:
             rows = db.fetchall()
 
         columns = (
-            "id",
-            "nome",
-            "matricula",
-            "funcao",
-            "turno",
-            "status",
-            "pa",
+            "id", "nome", "matricula",
+            "funcao", "turno", "status", "pa"
         )
 
-        return [
-            dict(zip(columns, row))
-            for row in rows
-        ]
+        return [dict(zip(columns, row)) for row in rows]

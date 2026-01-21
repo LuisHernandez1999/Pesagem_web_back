@@ -6,7 +6,7 @@ from apps.colaborador.exceptions.colaborador_exceptions import (
     PaInvalido,
 )
 ##### sql aulixar para camada mapper 
-def filtro_funcao_turno_sql(funcao, turno):
+def filtro_funcao_turno_sql(funcao, turno,pa):
     clauses = []
     params = []
 
@@ -17,6 +17,9 @@ def filtro_funcao_turno_sql(funcao, turno):
     if turno:
         clauses.append("AND turno = %s")
         params.append(turno)
+    if pa:
+        clauses.append("AND pa = %s")
+        params.append(pa)
 
     return " ".join(clauses), params
 

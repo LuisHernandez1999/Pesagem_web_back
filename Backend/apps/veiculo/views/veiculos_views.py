@@ -78,10 +78,11 @@ class VeiculoContagemTipoApiView(GenericAPIView):
 class VeiculoRankingPesagemApiView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
     queryset = Veiculo.objects.none()
+
     def get(self, request):
         try:
             dto = VeiculoRankingDTO.from_request(request)
-            data = VeiculoRankingService.ranking_pesagem_veiculo(dto)
+            data = VeiculoRankingService.get(dto)
             return Response(data, status=200)
         except ValueError as e:
             raise InvalidPayloadException(str(e))

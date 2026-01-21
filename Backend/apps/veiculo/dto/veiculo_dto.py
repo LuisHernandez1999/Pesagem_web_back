@@ -45,17 +45,19 @@ class VeiculoContagemTipoDTO:
     
 
 
+@dataclass
 class VeiculoRankingDTO:
-    cursor: int
-    search: Optional[str]
-    ordering: str
+    cursor: int 
+    search: Optional[str] = None
+    ordering: str = "total_pesagens"
     limit: int = 20
+
     @classmethod
-    def from_request(cls, request) -> "VeiculoListDTO":
-        query = request.query_params
+    def from_request(cls, request) -> "VeiculoRankingDTO":
+        q = request.query_params
         return cls(
-            cursor=int(query.get("cursor")) if query.get("cursor") else None,
-            search=query.get("search"),
-            ordering=query.get("ordering", "id"),
-            limit=int(query.get("limit", 20)),
+            cursor=int(q.get("cursor")) if q.get("cursor") else None,
+            search=q.get("search"),
+            ordering=q.get("ordering", "total_pesagens"),
+            limit=int(q.get("limit", 20)),
         )

@@ -240,11 +240,7 @@ class PesagemTipoServicoMapper:
             )
             return c.fetchone()[0]
         
-##### total de pesagens
-class PesagemQuantidadeMapper:
-    @staticmethod
-    def total(pesagem) -> int:
-        return pesagem.count()
+
 
 
 ##### pesagem com filtros avançados 

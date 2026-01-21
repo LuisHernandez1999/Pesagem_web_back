@@ -24,32 +24,7 @@ class ColaboradorServiceCreate:
 class ColaboradorServiceList:
     @staticmethod
     def listar(dto: ColaboradorListDTO):
-        cache_key = f"colaborador:{dto.cursor}:{dto.limit}:{dto.funcao}:{dto.turno}:{dto.ordering}"
-
-        cached = get_cache(cache_key)
-        if cached:
-            return cached
-
-        rows = ColaboradorMapperList.listar(
-            cursor=dto.cursor,
-            limit=dto.limit + 1,
-            funcao=dto.funcao,
-            turno=dto.turno,
-            ordering=dto.ordering
-        )
-
-        next_cursor = None
-        if len(rows) > dto.limit:
-            next_cursor = rows[-1]["id"]
-            rows = rows[:-1]
-
-        result = {
-            "results": rows,
-            "next_cursor": next_cursor,
-        }
-
-        set_cache(cache_key, result, timeout=30)
-        return result
+        return ColaboradorMapperList.listar(dto)
 
 
 

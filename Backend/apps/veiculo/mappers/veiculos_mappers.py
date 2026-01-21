@@ -1,6 +1,6 @@
 from django.db import connection
 from apps.veiculo.utils.veiculos_utils import cursor_sql_veiculo, search_sql_veiculo, order_sql_veiculo
-from apps.veiculo.dto.veiculo_dto import CreateVeiculoDTO,VeiculoListDTO
+from apps.veiculo.dto.veiculo_dto import CreateVeiculoDTO,VeiculoListDTO,VeiculoRankingDTO
 from apps.veiculo.utils.veiculos_utils import fetch_one
 
 class VeiculoMapperCreate:
@@ -44,7 +44,8 @@ class VeiculoMapperList:
     def listar(cursor, limit, search, ordering):
         search_clause, search_params = search_sql_veiculo(search)
         cursor_clause, cursor_params = cursor_sql_veiculo(cursor)
-        ordering_clause = order_sql_veiculo(ordering)
+        ordering_clause = order_sql_veiculo(ordering) or "id"
+
         sql = f"""
             SELECT
                 id,
@@ -54,12 +55,11 @@ class VeiculoMapperList:
                 em_manutencao,
                 tipo_servico,
                 equipamento
-            Where
             FROM veiculo
             WHERE 1=1
             {search_clause}
             {cursor_clause}
-            ORDER BY {ordering_clause}, id DESC
+            ORDER BY {ordering_clause} DESC, id DESC
             LIMIT %s
         """
 
@@ -68,6 +68,7 @@ class VeiculoMapperList:
             *cursor_params,
             limit,
         ]
+
         with connection.cursor() as db:
             db.execute(sql, params)
             rows = db.fetchall()
@@ -111,92 +112,49 @@ class VeiculosMapperTipo:
 
 class RankingVeiculosPesagemMapper:
     @staticmethod
-    def get(
-        prefixo,
-        pa,
-        tipo_servico,
-        tipo_veiculo,
-        equipamento,
-        search,
-        cursor,
-        ordering,
-        limit,
-        dto: VeiculoListDTO
-    ):
-        search_clause, search_params = search_sql_veiculo(search)
-        cursor_clause, cursor_params = cursor_sql_veiculo(cursor)
-        ordering_clause = order_sql_veiculo(ordering)
+    def get(dto):
+        search_clause, search_params = search_sql_veiculo(dto.search)
+        cursor_clause, cursor_params = cursor_sql_veiculo(dto.cursor)
 
         sql = f"""
         SELECT
-            ranking,
-            veiculo,
-            total_pesagens,
-            eficiencia_percentual
-        FROM (
-            SELECT
-                ROW_NUMBER() OVER (
-                    ORDER BY COUNT(p.id) DESC, p.prefixo ASC
-                ) AS ranking,
-                p.prefixo AS veiculo,
-                COUNT(p.id) AS total_pesagens,
-                ROUND(
-                    (COUNT(p.id) * 100.0) /
-                    NULLIF(SUM(COUNT(p.id)) OVER (), 0),
-                    2
-                ) AS eficiencia_percentual
-            FROM pesagem p
-            WHERE 1=1
-            {search_clause}
-            {cursor_clause}
+            v.prefixo AS veiculo,
+            COUNT(p.id) AS total_pesagens
+        FROM pesagem p
+        JOIN veiculo v ON v.id = p.prefixo_id
+        WHERE 1=1
+        {search_clause}
+        {cursor_clause}
+        GROUP BY v.prefixo
+        ORDER BY total_pesagens DESC, v.prefixo ASC
+        LIMIT %s
         """
-
-        if getattr(dto, "prefixo", None):
-            sql += " AND v.prefixo = %s"
-            params.append(dto.prefixo)
 
         params = [
             *search_params,
             *cursor_params,
+            dto.limit,
         ]
-
-       
-        if prefixo:
-            sql += " AND p.prefixo = %s"
-            params.append(prefixo)
-
-        if pa:
-            sql += " AND v.pa = %s"
-            params.append(pa)
-
-        if tipo_servico:
-            sql += " AND p.tipo_servico = %s"
-            params.append(tipo_servico)
-
-        if tipo_veiculo:
-            sql += " AND v.tipo_veiculo = %s"
-            params.append(tipo_veiculo)
-
-        if equipamento:
-            sql += " AND v.equipamento = %s"
-            params.append(equipamento)
-
-        sql += f"""
-            GROUP BY p.prefixo
-        ) ranked
-        ORDER BY {ordering_clause}
-        LIMIT %s
-        """
-
-        params.append(limit)
 
         with connection.cursor() as db:
             db.execute(sql, params)
             rows = db.fetchall()
-            columns = [col[0] for col in db.description]
 
-        return [dict(zip(columns, row)) for row in rows]
-    
+        data = [
+            {"veiculo": r[0], "total_pesagens": r[1]}
+            for r in rows
+        ]
+
+        total_geral = sum(i["total_pesagens"] for i in data) or 1
+
+        for idx, item in enumerate(data, start=1):
+            item["ranking"] = idx
+            item["eficiencia_percentual"] = round(
+                (item["total_pesagens"] * 100) / total_geral,
+                2
+            )
+
+        return data
 
 
     

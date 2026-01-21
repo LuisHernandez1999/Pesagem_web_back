@@ -8,7 +8,7 @@ from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO,PesagemListDTO,ExibirP
 from apps.pesagem.service.pesagem_service import (PesagemServiceCreate
                                                   ,PesagemServiceListTipo, 
                                                   PesagemListService,ExibirPesagemPorMesService,
-                                                  PesagemTotalService,PesagemServiceDoc)
+                                                  PesagemServiceDoc)
 from apps.pesagem.exceptions.pesagem_execptions import PesagemException
 from apps.pesagem.models.pesagem import Pesagem
 from apps.pesagem.documents.doc_generator import PesagemExcelDocument
@@ -74,23 +74,7 @@ class ExibirPesagemPorMesAPIView(GenericAPIView):
 
 
 
-class PesagemTotalAPIView(GenericAPIView):
-    permission_classes=[IsAuthenticated,DjangoModelPermissionsWithView]
-    queryset=Pesagem.objects.none()
-    def get(self,request):
-        try:
-            total_pesagem= PesagemTotalService.total_pesagem()
 
-            return Response(
-                {
-                    "Total_pesagem": total_pesagem
-                }
-            )
-        except Exception as e:
-            return Response(
-                {"detail": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
 
 
 
