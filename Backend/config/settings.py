@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     "apps.veiculo.apps.VeiculoConfig",
     "apps.colaborador.apps.ColaboradorConfig",
     "apps.cooperativa.apps.CooperativaConfig",
+    "apps.os.apps.OrdemDeServicoConfig",
     "apps.pesagem.apps.PesagemConfig",
     "rest_framework_simplejwt",
     "corsheaders",

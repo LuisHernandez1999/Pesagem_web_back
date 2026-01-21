@@ -28,6 +28,7 @@ from apps.pesagem.views.pesagem_views import (PesagemCreateApiView,
                                               PesagemTipoServicoView,PesagemListApiView
                                               ,ExibirPesagemPorMesAPIView
                                               ,PesagemGerarDocumentoAPIView)
+from apps.os.views.os_views import OrdemServicoCreateAPIView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -47,5 +48,5 @@ urlpatterns = [
     path("api/pesagem-list-por-mes/",ExibirPesagemPorMesAPIView.as_view(),name="PesagemListPorMes"),
     path("api/pesagem-tipo_servico/",PesagemTipoServicoView.as_view(),name="PesagemList"),
     path("api/pesagem-excel/",PesagemGerarDocumentoAPIView.as_view(),name="PesagemExcel"),
-
+    path("api/os-create/",OrdemServicoCreateAPIView.as_view(),name="OrdemServicoCreate")
 ]
