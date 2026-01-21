@@ -1,4 +1,4 @@
-from apps.colaborador.dto.colaborador_dto import CreateColaboradorDTO,ColaboradorListDTO
+from apps.colaborador.dto.colaborador_dto import CreateColaboradorDTO,ColaboradorListDTO,ColaboradorListItemDTO
 from apps.colaborador.utils.colaborador_utils import fetch_one
 from django.db import connection
 from apps.colaborador.utils.colaborador_utils import filtro_funcao_turno_sql,order_sql_colaborador
@@ -78,4 +78,15 @@ class ColaboradorMapperList:
             "funcao", "turno", "status", "pa"
         )
 
-        return [dict(zip(columns, row)) for row in rows]
+        return [
+            ColaboradorListItemDTO(
+                id=row[0],
+                nome=row[1],
+                matricula=row[2],
+                funcao=row[3],
+                turno=row[4],
+                status=row[5],
+                pa=row[6],
+            )
+            for row in rows
+        ]

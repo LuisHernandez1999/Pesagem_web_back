@@ -1,4 +1,4 @@
-from apps.veiculo.dto.veiculo_dto import VeiculoListDTO,CreateVeiculoDTO,VeiculoContagemTipoDTO,VeiculoRankingDTO
+from apps.veiculo.dto.veiculo_dto import VeiculoListDTO,VeiculoDTO,VeiculoContagemTipoDTO,VeiculoRankingDTO
 from apps.veiculo.mappers.veiculos_mappers import VeiculoMapperList,VeiculoMapperCreate,VeiculosMapperTipo,RankingVeiculosPesagemMapper
 from apps.pesagem.utils.cache_utils import get_cache, set_cache
 from apps.veiculo.utils.veiculos_utils import validar_veiculo
@@ -10,7 +10,7 @@ from django.db import  transaction
 class VeiculoServiceCreate:
     @staticmethod
     @transaction.atomic
-    def create(dto: CreateVeiculoDTO) -> int:
+    def create(dto: VeiculoDTO) -> int:
         validar_veiculo(dto)
         return VeiculoMapperCreate
         

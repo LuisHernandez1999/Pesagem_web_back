@@ -37,5 +37,13 @@ class ColaboradorListDTO:
         ordering=request.query_params.get("ordering") or "id",
     )
 
-
+@dataclass(slots=True)
+class ColaboradorListItemDTO:
+    id: int
+    nome: str
+    matricula: str
+    funcao: str
+    turno: str
+    status: str
+    pa: str
 

@@ -6,6 +6,7 @@ from apps.colaborador.services.colaborador_services import ColaboradorServiceCre
 from apps.colaborador.exceptions.colaborador_exceptions import ColaboradorException
 from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
 from apps.colaborador.models.colaborador import Colaborador
+from dataclasses import asdict
 
 ##### respotas http de criacao 
 class ColaboradorCreateApiView(GenericAPIView):
@@ -23,8 +24,12 @@ class ColaboradorCreateApiView(GenericAPIView):
 class ColaboradorListApiView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
     queryset = Colaborador.objects.all()
+
     def get(self, request):
         dto = ColaboradorListDTO.from_request(request)
-        data = ColaboradorServiceList.listar(dto)
-        return Response(data, status=200)
+        items = ColaboradorServiceList.listar(dto)
+        return Response(
+            [asdict(item) for item in items],
+            status=200
+        )
 

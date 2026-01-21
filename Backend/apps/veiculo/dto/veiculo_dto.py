@@ -5,7 +5,7 @@ from rest_framework.request import Request
 
 
 @dataclass(frozen=True, slots=True)
-class CreateVeiculoDTO:
+class VeiculoDTO:
     prefixo: str
     tipo_veiculo: str
     placa_veiculo: Optional[str]
@@ -13,6 +13,8 @@ class CreateVeiculoDTO:
     status: str
     tipo_servico: str
     equipamento: str
+
+
 
 
 @dataclass(slots=True)
@@ -43,6 +45,7 @@ class VeiculoContagemTipoDTO:
             tipo_servico=tipo_servico
         )
     
+    
 
 
 @dataclass
@@ -51,7 +54,6 @@ class VeiculoRankingDTO:
     search: Optional[str] = None
     ordering: str = "total_pesagens"
     limit: int = 20
-
     @classmethod
     def from_request(cls, request) -> "VeiculoRankingDTO":
         q = request.query_params

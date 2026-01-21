@@ -1,7 +1,7 @@
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from apps.veiculo.dto.veiculo_dto import VeiculoListDTO,CreateVeiculoDTO,VeiculoContagemTipoDTO,VeiculoRankingDTO
+from apps.veiculo.dto.veiculo_dto import VeiculoListDTO,VeiculoDTO,VeiculoContagemTipoDTO,VeiculoRankingDTO
 from apps.veiculo.exceptions.veiculos_exceptions import VeiculoException
 from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
 from apps.veiculo.services.veiculos_service import VeiculoServiceCreate,VeiculoServiceContagem,VeiculoServiceList,VeiculoRankingService
@@ -16,7 +16,7 @@ class VeiculoCreateApiView(GenericAPIView):
      queryset = Veiculo.objects.none()
      def post(self, request):
         try:
-            dto = CreateVeiculoDTO(**request.data)
+            dto = VeiculoDTO(**request.data)
             veiculo_id = VeiculoServiceCreate.create(dto)
             return Response({"veiculo criado com sucesso id": veiculo_id}, status=201)
 

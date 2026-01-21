@@ -1,6 +1,6 @@
 from django.db import connection
 from apps.veiculo.utils.veiculos_utils import cursor_sql_veiculo, search_sql_veiculo, order_sql_veiculo
-from apps.veiculo.dto.veiculo_dto import CreateVeiculoDTO,VeiculoListDTO,VeiculoRankingDTO
+from apps.veiculo.dto.veiculo_dto import VeiculoDTO,VeiculoListDTO,VeiculoRankingDTO
 from apps.veiculo.utils.veiculos_utils import fetch_one
 
 class VeiculoMapperCreate:
@@ -18,7 +18,7 @@ class VeiculoMapperCreate:
         return fetch_one(sql, (placa_veiculo,)) is not None
     #### metodo create 
     @staticmethod
-    def insert(dto: CreateVeiculoDTO) -> int:
+    def insert(dto: VeiculoDTO) -> int:
         sql = """
             INSERT INTO veiculo (
                 prefixo, tipo, placa_veiculo,
