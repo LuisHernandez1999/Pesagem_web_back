@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "apps.colaborador.apps.ColaboradorConfig",
     "apps.cooperativa.apps.CooperativaConfig",
     "apps.os.apps.OrdemDeServicoConfig",
+    "apps.movimentacao.apps.MovimentacaoConfig",
     "apps.pesagem.apps.PesagemConfig",
     "rest_framework_simplejwt",
     "corsheaders",

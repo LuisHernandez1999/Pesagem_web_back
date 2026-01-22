@@ -9,38 +9,33 @@ class OrdemServico(models.Model):
     )
 
     os_numero = models.CharField(
-        max_length=50,
-        unique=True,
+        max_length=20,  
         verbose_name="Número da OS"
     )
 
     veiculo = models.ForeignKey(
         Veiculo,
-        on_delete=models.PROTECT,
+        on_delete=models.PROTECT,       # equivalente ao RESTRICT
         related_name='ordens_servico',
-        db_column='prefixo_id',
-        verbose_name="Veículo"
+        db_column='prefixo_id'
     )
-
     inicio_problema = models.DateTimeField(
         verbose_name="Início do Problema"
     )
-
     conclusao = models.DateTimeField(
         null=True,
         blank=True,
         verbose_name="Conclusão"
     )
-
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Criado em"
     )
-
     class Meta:
         db_table = 'os'
         verbose_name = "Ordem de Serviço"
         verbose_name_plural = "Ordens de Serviço"
+        ##managed = False  # 🔴 IMPORTANTE se o banco já existe##
         indexes = [
             models.Index(fields=['veiculo'], name='fk_os_veiculo'),
         ]

@@ -13,40 +13,57 @@ class OrdemServicoService:
     @transaction.atomic
     def criar(dto: OrdemServicoCreateDTO) -> OrdemServico:
 
+        # ===== validações =====
+        if not dto.pa:
+            raise ValidationError("pa é obrigatório")
+
+        if not dto.os_numero:
+            raise ValidationError("os_numero é obrigatório")
+
+        if not dto.veiculo_prefixo:
+            raise ValidationError("veiculo_prefixo é obrigatório")
+
+        # ===== buscar veículo por prefixo =====
         try:
-            veiculo = Veiculo.objects.get(id=dto.veiculo_id)
+            veiculo = Veiculo.objects.get(prefixo=dto.veiculo_prefixo)
         except Veiculo.DoesNotExist:
-            raise ValidationError("Veículo não encontrado")
+            raise ValidationError("Veículo não encontrado para o prefixo informado")
 
-        # ===== parse datetime =====
-        inicio_problema = dto.inicio_problema
+        # ===== inicio_problema =====
+        inicio = dto.inicio_problema
+        if isinstance(inicio, str):
+            inicio = parse_datetime(inicio)
 
-        if isinstance(inicio_problema, str):
-            inicio_problema = parse_datetime(inicio_problema)
+        if not inicio:
+            raise ValidationError("inicio_problema inválido")
 
-        if not inicio_problema:
-            raise ValidationError("inicio_problema é obrigatório")
+        if timezone.is_naive(inicio):
+            inicio = timezone.make_aware(inicio)
 
-        if timezone.is_naive(inicio_problema):
-            inicio_problema = timezone.make_aware(inicio_problema)
+        # ===== conclusao (opcional) =====
+        conclusao = dto.conclusao
+        if conclusao:
+            if isinstance(conclusao, str):
+                conclusao = parse_datetime(conclusao)
 
-        # ===== regra: uma OS aberta por veículo =====
-        if OrdemServico.objects.filter(
+            if not conclusao:
+                raise ValidationError("conclusao inválida")
+
+            if timezone.is_naive(conclusao):
+                conclusao = timezone.make_aware(conclusao)
+
+        # ===== regra: OS aberta =====
+        if not conclusao and OrdemServico.objects.filter(
             veiculo=veiculo,
             conclusao__isnull=True
         ).exists():
-            raise ValidationError(
-                "Este veículo já possui uma OS em aberto"
-            )
+            raise ValidationError("Este veículo já possui uma OS em aberto")
 
-        # ===== gerar número da OS =====
-        os_numero = timezone.now().strftime("%Y%m%d%H%M%S%f")
-
-        os = OrdemServico.objects.create(
+        # ===== criar =====
+        return OrdemServico.objects.create(
             pa=dto.pa,
-            os_numero=os_numero,
+            os_numero=dto.os_numero,
             veiculo=veiculo,
-            inicio_problema=inicio_problema
+            inicio_problema=inicio,
+            conclusao=conclusao
         )
-
-        return os
