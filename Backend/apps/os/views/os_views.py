@@ -1,69 +1,57 @@
-from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
+from dataclasses import asdict
+from rest_framework.permissions import IsAuthenticated
+from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ValidationError
-from apps.os.services.os_services import OrdemServicoService
-from apps.os.dto.os_dto import OrdemServicoCreateDTO
+from apps.os.services.os_services import OrdemServicoVisualizacaoService
+from apps.os.dto.os_dto import OrdemServicoCreateDTO,OrdemServicoListFilterDTO
+from apps.os.models.os import OrdemServico
+from apps.os.services.os_services import OrdemServicoServiceCreate
 
-
-class OrdemServicoCreateAPIView(APIView):
-
-    CAMPOS_PERMITIDOS = {
-        "pa",
-        "os_numero",
-        "veiculo_prefixo",
-        "inicio_problema",
-        "conclusao"
-    }
-
+###### POST
+class OrdemServicoCreateView(GenericAPIView):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    queryset = OrdemServico.objects.none()
     def post(self, request):
-
-        extras = set(request.data.keys()) - self.CAMPOS_PERMITIDOS
-        if extras:
-            return Response(
-                {"erro": f"Campos não permitidos: {list(extras)}"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         try:
-            dto = OrdemServicoCreateDTO(
-                pa=request.data["pa"],
-                os_numero=request.data["os_numero"],
-                veiculo_prefixo=request.data["veiculo_prefixo"],
-                inicio_problema=request.data["inicio_problema"],
-                conclusao=request.data.get("conclusao")
-            )
-
-            os = OrdemServicoService.criar(dto)
+            dto = OrdemServicoCreateDTO(**request.data)
+            result_dto = OrdemServicoServiceCreate.create(dto)
 
             return Response(
-                {
-                    "id": os.id,
-                    "pa": os.pa,
-                    "os_numero": os.os_numero,
-                    "veiculo_prefixo": os.veiculo.prefixo,
-                    "veiculo_id": os.veiculo_id,  
-                    "inicio_problema": os.inicio_problema,
-                    "conclusao": os.conclusao,
-                    "created_at": os.created_at
-                },
+                asdict(result_dto),   
                 status=status.HTTP_201_CREATED
             )
-
-        except KeyError as e:
-            return Response(
-                {"erro": f"Campo obrigatório ausente: {str(e)}"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         except ValidationError as e:
             return Response(
-                {"erro": e.message},
+                {"detail": e.message},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
 
-        except Exception as e:
-            return Response(
-                {"erro": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+
+###### GET
+class OrdemServicoVisualizacaoAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    queryset = OrdemServico.objects.none()
+    def get(self, request):
+        filtros_dto = OrdemServicoListFilterDTO(
+            cursor_id=int(request.query_params.get("cursor_id"))
+            if request.query_params.get("cursor_id") else None,
+            veiculo_prefixo=request.query_params.get("veiculo_prefixo"),
+            os_numero=request.query_params.get("os_numero"),
+            pa=request.query_params.get("pa"),
+            aberta=(
+                request.query_params.get("aberta").lower() == "true"
+                if request.query_params.get("aberta") is not None
+                else None
             )
+        )
+
+        response_dto = OrdemServicoVisualizacaoService.listar(filtros_dto)
+
+        return Response(
+            asdict(response_dto),
+            status=status.HTTP_200_OK
+        )

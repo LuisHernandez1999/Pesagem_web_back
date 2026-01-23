@@ -7,7 +7,8 @@ ROLES = {
         "cooperativa.cooperativa": ["view", "add", "change", "delete"],
         "colaborador.colaborador": ["view", "add", "change", "delete"],
         "pesagem.pesagem": ["view", "add", "change", "delete"],
-        "os.os": ["view", "add", "change", "delete"],
+        "os.ordemservico": ["view", "add", "change", "delete"],
+        "movimentacao.movimentacao": ["view", "add", "change", "delete"],
          
     },
 }

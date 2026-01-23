@@ -21,14 +21,20 @@ from apps.infra.auth.views.register_views import RegisterUserAPIView
 from django.urls import path
 from apps.infra.auth.views.generate_invite_view import GenerateInviteAPIView
 from apps.infra.auth.views.register_views import RegisterByInviteAPIView
-from apps.veiculo.views.veiculos_views import VeiculoListApiView,VeiculoCreateApiView,VeiculoRankingPesagemApiView
-from apps.cooperativa.views.cooperativa_views import CooperativaCreateAPIView,EficienciaCooperativaRankingAPIView
-from apps.colaborador.views.colaborador_views import ColaboradorCreateApiView,ColaboradorListApiView
+from apps.veiculo.views.veiculos_views import (VeiculoListApiView,
+                                               VeiculoCreateApiView,VeiculoRankingPesagemApiView)
+from apps.cooperativa.views.cooperativa_views import (CooperativaCreateAPIView,
+                                                      EficienciaCooperativaRankingAPIView)
+from apps.colaborador.views.colaborador_views import (ColaboradorCreateApiView,
+                                                      ColaboradorListApiView)
 from apps.pesagem.views.pesagem_views import (PesagemCreateApiView,
-                                              PesagemTipoServicoView,PesagemListApiView
+                                              PesagemTipoServicoView,
+                                               PesagemListApiView
                                               ,ExibirPesagemPorMesAPIView
                                               ,PesagemGerarDocumentoAPIView)
-from apps.os.views.os_views import OrdemServicoCreateAPIView
+from apps.os.views.os_views import OrdemServicoCreateView,OrdemServicoVisualizacaoAPIView
+from apps.movimentacao.views.movimentacao_views import MovimentacaoCreateAPIView,MovimentacaoListAPIView
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -48,5 +54,8 @@ urlpatterns = [
     path("api/pesagem-list-por-mes/",ExibirPesagemPorMesAPIView.as_view(),name="PesagemListPorMes"),
     path("api/pesagem-tipo_servico/",PesagemTipoServicoView.as_view(),name="PesagemList"),
     path("api/pesagem-excel/",PesagemGerarDocumentoAPIView.as_view(),name="PesagemExcel"),
-    path("api/os-create/",OrdemServicoCreateAPIView.as_view(),name="OrdemServicoCreate")
+    path("api/os-create/",OrdemServicoCreateView.as_view(),name="OrdemServicoCreate"),
+    path("api/os-list/",OrdemServicoVisualizacaoAPIView.as_view(),name="list-Os"),
+    path("api/movimentacao-create/",MovimentacaoCreateAPIView.as_view(),name="MovimentacaoCreate"),
+    path("api/movimentacao-list/",MovimentacaoListAPIView.as_view(),name='MovimentacaoList'),
 ]

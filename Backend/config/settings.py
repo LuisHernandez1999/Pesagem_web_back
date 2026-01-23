@@ -10,10 +10,7 @@ SECRET_KEY = "django-insecure-6g4mh%o#389z4-4b!qt$69dt-x$zhy2sfeb=d-t@=$==2ek^yq
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS: list[str] = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -23,6 +20,7 @@ INSTALLED_APPS = [
     "apps.cooperativa.apps.CooperativaConfig",
     "apps.os.apps.OrdemDeServicoConfig",
     "apps.movimentacao.apps.MovimentacaoConfig",
+    "apps.insumos.apps.InsumosConfig",
     "apps.pesagem.apps.PesagemConfig",
     "rest_framework_simplejwt",
     "corsheaders",
