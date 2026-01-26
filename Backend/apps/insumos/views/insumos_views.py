@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from apps.insumos.dto.insumos_dto import InsumoCreateDTO
 from apps.insumos.services.insumos_services import InsumoServiceCreate
 from apps.insumos.dto.insumos_dto import InsumoListCursorDTO
-from apps.insumos.services.insumos_services import InsumoListCursorDTO
 
 
 class InsumoCreateAPIView(APIView):
@@ -57,7 +56,6 @@ class InsumoCreateAPIView(APIView):
 
 
 class InsumoListAPIView(APIView):
-
     def get(self, request):
         try:
             dto = InsumoListCursorDTO(

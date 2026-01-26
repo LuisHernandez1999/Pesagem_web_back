@@ -38,8 +38,8 @@ from apps.movimentacao.views.movimentacao_views import MovimentacaoCreateAPIView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/login/", LoginApiView.as_view(), name="login"),
-    path("api/register/", RegisterUserAPIView.as_view(), name="register"),
+    path("login/", LoginApiView.as_view(), name="login"),
+    path("register/", RegisterUserAPIView.as_view(), name="register"),
     path("api/invite/", GenerateInviteAPIView.as_view(),name="Invite"),
     path("api/register-by-invite/", RegisterByInviteAPIView.as_view(),name="InviteRegister"),
     path("api/veiculos-list/",VeiculoListApiView.as_view(),name="VeiculosList"),

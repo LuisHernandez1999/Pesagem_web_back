@@ -5,15 +5,13 @@ from apps.veiculo.utils.veiculos_utils import validar_veiculo
 from django.db import  transaction
 
 
-
-##### cadastro de veiculos
 class VeiculoServiceCreate:
     @staticmethod
     @transaction.atomic
     def create(dto: VeiculoDTO) -> int:
         validar_veiculo(dto)
-        return VeiculoMapperCreate
-        
+        veiculo_id = VeiculoMapperCreate.insert(dto)
+        return veiculo_id
 
 class VeiculoServiceList:
     @staticmethod

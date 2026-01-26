@@ -1,4 +1,5 @@
 from rest_framework.generics import GenericAPIView
+from dataclasses import asdict
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from apps.veiculo.dto.veiculo_dto import VeiculoListDTO,VeiculoDTO,VeiculoContagemTipoDTO,VeiculoRankingDTO
@@ -12,24 +13,30 @@ from apps.veiculo.exceptions.veiculos_exceptions import (
 )
 ##### https de criacao
 class VeiculoCreateApiView(GenericAPIView):
-     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
-     queryset = Veiculo.objects.none()
-     def post(self, request):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    queryset = Veiculo.objects.none()
+
+    def post(self, request):
         try:
             dto = VeiculoDTO(**request.data)
+
             veiculo_id = VeiculoServiceCreate.create(dto)
-            return Response({"veiculo criado com sucesso id": veiculo_id}, status=201)
+
+            return Response(
+                {
+                    "message": "Veículo criado com sucesso",
+                    "id": veiculo_id,
+                    "payload": asdict(dto)
+                },
+                status=201
+            )
 
         except TypeError:
             return Response(
                 {"detail": "Payload inválido"},
                 status=422,
             )
-        except VeiculoException as e:
-            return Response(
-                {"detail": e.detail},
-                status=e.status_code,
-            )
+
         except VeiculoException as e:
             return Response(
                 {"detail": e.detail},
