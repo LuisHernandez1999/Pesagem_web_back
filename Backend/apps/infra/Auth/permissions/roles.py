@@ -9,6 +9,7 @@ ROLES = {
         "pesagem.pesagem": ["view", "add", "change", "delete"],
         "os.ordemservico": ["view", "add", "change", "delete"],
         "movimentacao.movimentacao": ["view", "add", "change", "delete"],
+        "insumos.insumo": ["view", "add", "change", "delete"],
          
     },
 }

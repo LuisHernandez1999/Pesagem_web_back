@@ -1,13 +1,17 @@
-from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
+from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
 from rest_framework.response import Response
 from rest_framework import status
+from apps.insumos.models.insumos import Insumo
 from django.core.exceptions import ValidationError
 from apps.insumos.dto.insumos_dto import InsumoCreateDTO
 from apps.insumos.services.insumos_services import InsumoServiceCreate
 from apps.insumos.dto.insumos_dto import InsumoListCursorDTO
 
 
-class InsumoCreateAPIView(APIView):
+class InsumoCreateAPIView(GenericAPIView):
+    [IsAuthenticated, DjangoModelPermissionsWithView]
     CAMPOS_PERMITIDOS = {
         "id_movimentacao",
         "item_insumo"
@@ -55,7 +59,9 @@ class InsumoCreateAPIView(APIView):
 
 
 
-class InsumoListAPIView(APIView):
+class InsumoListAPIView(GenericAPIView):
+    [IsAuthenticated, DjangoModelPermissionsWithView]
+    queryset = Insumo.objects.none()
     def get(self, request):
         try:
             dto = InsumoListCursorDTO(

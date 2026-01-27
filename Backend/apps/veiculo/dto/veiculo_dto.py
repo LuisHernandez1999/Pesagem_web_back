@@ -10,10 +10,8 @@ class VeiculoDTO:
     tipo_veiculo: str
     placa_veiculo: Optional[str]
     em_manutencao: str
-    status: str
     tipo_servico: str
     equipamento: str
-
 
 
 

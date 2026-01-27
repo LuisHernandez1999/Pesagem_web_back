@@ -18,11 +18,11 @@ from django.contrib import admin
 from django.urls import path
 from apps.infra.auth.views.login_views import LoginApiView
 from apps.infra.auth.views.register_views import RegisterUserAPIView
-from django.urls import path
 from apps.infra.auth.views.generate_invite_view import GenerateInviteAPIView
 from apps.infra.auth.views.register_views import RegisterByInviteAPIView
 from apps.veiculo.views.veiculos_views import (VeiculoListApiView,
-                                               VeiculoCreateApiView,VeiculoRankingPesagemApiView)
+                                               VeiculoCreateApiView,
+                                               VeiculoRankingPesagemApiView)
 from apps.cooperativa.views.cooperativa_views import (CooperativaCreateAPIView,
                                                       EficienciaCooperativaRankingAPIView)
 from apps.colaborador.views.colaborador_views import (ColaboradorCreateApiView,
@@ -32,8 +32,12 @@ from apps.pesagem.views.pesagem_views import (PesagemCreateApiView,
                                                PesagemListApiView
                                               ,ExibirPesagemPorMesAPIView
                                               ,PesagemGerarDocumentoAPIView)
-from apps.os.views.os_views import OrdemServicoCreateView,OrdemServicoVisualizacaoAPIView
-from apps.movimentacao.views.movimentacao_views import MovimentacaoCreateAPIView,MovimentacaoListAPIView
+from apps.os.views.os_views import (OrdemServicoCreateView,
+                                    OrdemServicoVisualizacaoAPIView)
+from apps.movimentacao.views.movimentacao_views import (MovimentacaoCreateAPIView,
+                                                        MovimentacaoListAPIView)
+from apps.insumos.views.insumos_views import (InsumoCreateAPIView,
+                                              InsumoListAPIView)
 
 
 urlpatterns = [
@@ -58,4 +62,6 @@ urlpatterns = [
     path("api/os-list/",OrdemServicoVisualizacaoAPIView.as_view(),name="list-Os"),
     path("api/movimentacao-create/",MovimentacaoCreateAPIView.as_view(),name="MovimentacaoCreate"),
     path("api/movimentacao-list/",MovimentacaoListAPIView.as_view(),name='MovimentacaoList'),
+    path("api/insumos-create/",InsumoCreateAPIView.as_view(),name="InsumosCreate"),
+    path("api/insumos-list/",InsumoListAPIView.as_view(),name="InsumosList")
 ]

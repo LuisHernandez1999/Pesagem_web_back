@@ -7,30 +7,40 @@ from apps.insumos.dto.insumos_dto import (
     InsumoListCursorDTO
 )
 
-
 class InsumoServiceCreate:
     @staticmethod
     @transaction.atomic
     def criar(dto: InsumoCreateDTO) -> Insumo:
-        # ===== validações =====
+        # ===================
+        # validações
+        # ===================
+        if not dto.os_numero:
+            raise ValidationError("os_numero é obrigatório")
         if not dto.item_insumo:
             raise ValidationError("item_insumo é obrigatório")
+        # =========================
+        # buscar por  OS  e ordenar pelo id mais recente  
+        # =========================
+        movimentacao = (
+            Movimentacao.objects
+            .select_related("os")
+            .filter(os__os_numero=dto.os_numero)
+            .order_by("-id_movimentacao")
+            .first()
+        )
 
-        try:
-            movimentacao = Movimentacao.objects.get(
-                id_movimentacao=dto.id_movimentacao
+        if not movimentacao:
+            raise ValidationError(
+                "Nenhuma movimentação encontrada para a OS informada"
             )
-        except Movimentacao.DoesNotExist:
-            raise ValidationError("Movimentação não encontrada")
 
-        # ===== criar =====
+        # =========================
+        # criar insumo
+        # =========================
         return Insumo.objects.create(
             movimentacao=movimentacao,
             item_insumo=dto.item_insumo
         )
-
-
-
 
 class InsumoListService:
     @staticmethod

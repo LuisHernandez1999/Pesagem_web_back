@@ -42,3 +42,5 @@ class MovimentacaoListDTO:
     responsavel_matricula: int
     responsavel_nome: str
     observacao: Optional[str]
+    next_cursor: int = None
+    limit: int = 20

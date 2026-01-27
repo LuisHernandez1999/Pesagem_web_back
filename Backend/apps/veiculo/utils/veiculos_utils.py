@@ -62,7 +62,5 @@ def validar_veiculo(dto):
         raise PlacaAlreadyExists()
     if not dto.tipo_veiculo:
         raise TipoVeiculoInvalido()
-    if not dto.status:
-        raise StatusVeiculoInvalido()
     if not dto.tipo_servico:
         raise TipoServicoInvalido()
