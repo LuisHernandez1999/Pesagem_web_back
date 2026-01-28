@@ -10,7 +10,10 @@ ROLES = {
         "os.ordemservico": ["view", "add", "change", "delete"],
         "movimentacao.movimentacao": ["view", "add", "change", "delete"],
         "insumos.insumo": ["view", "add", "change", "delete"],
-         
+        "celular.celular": ["view", "add", "change", "delete"],
+        "soltura.soltura":["view", "add", "change", "delete"],
+        "confirmacao.confirmacaoservico": ["view", "add", "change", "delete"]
+,
     },
 }
 

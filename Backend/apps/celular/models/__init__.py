@@ -1,0 +1,1 @@
+from .celular import Celular

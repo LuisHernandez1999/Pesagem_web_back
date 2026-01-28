@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from apps.infra.auth.views.login_views import LoginApiView
+from apps.infra.auth.views.refresh_token_view import RefreshTokenView
 from apps.infra.auth.views.register_views import RegisterUserAPIView
 from apps.infra.auth.views.generate_invite_view import GenerateInviteAPIView
 from apps.infra.auth.views.register_views import RegisterByInviteAPIView
@@ -38,11 +39,16 @@ from apps.movimentacao.views.movimentacao_views import (MovimentacaoCreateAPIVie
                                                         MovimentacaoListAPIView)
 from apps.insumos.views.insumos_views import (InsumoCreateAPIView,
                                               InsumoListAPIView)
+from apps.celular.views.celular_views import (CelularCreateAPIView)
+from apps.soltura.views.remocao_views import (SolturaRemocaoStatsAPIView,
+                                              RemocaoListAPIView)
+from apps.confirmacao.views.confirmacao_views import (ConfirmacaoServicoCreateView)
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("login/", LoginApiView.as_view(), name="login"),
+    path("auth/refresh/",RefreshTokenView.as_view(),name="RefreshToken"),
     path("register/", RegisterUserAPIView.as_view(), name="register"),
     path("api/invite/", GenerateInviteAPIView.as_view(),name="Invite"),
     path("api/register-by-invite/", RegisterByInviteAPIView.as_view(),name="InviteRegister"),
@@ -63,5 +69,9 @@ urlpatterns = [
     path("api/movimentacao-create/",MovimentacaoCreateAPIView.as_view(),name="MovimentacaoCreate"),
     path("api/movimentacao-list/",MovimentacaoListAPIView.as_view(),name='MovimentacaoList'),
     path("api/insumos-create/",InsumoCreateAPIView.as_view(),name="InsumosCreate"),
-    path("api/insumos-list/",InsumoListAPIView.as_view(),name="InsumosList")
+    path("api/insumos-list/",InsumoListAPIView.as_view(),name="InsumosList"),
+    path("api/create-celular/",CelularCreateAPIView.as_view(),name="CelularCreate"),
+    path("api/remocao-stats/",SolturaRemocaoStatsAPIView.as_view(),name="RemocaoStats"),
+    path("api/list-remocao/",RemocaoListAPIView.as_view(),name="ListRemocao"),
+    path("api/create-confirmacao/",ConfirmacaoServicoCreateView.as_view(),name="CreateConfirmacao")
 ]
