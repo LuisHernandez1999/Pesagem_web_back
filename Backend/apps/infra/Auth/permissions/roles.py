@@ -12,6 +12,8 @@ ROLES = {
         "insumos.insumo": ["view", "add", "change", "delete"],
         "celular.celular": ["view", "add", "change", "delete"],
         "soltura.soltura":["view", "add", "change", "delete"],
+        "soltura.rota":["view", "add", "change", "delete"],
+        "soltura.setor":["view", "add", "change", "delete"],
         "confirmacao.confirmacaoservico": ["view", "add", "change", "delete"]
 ,
     },

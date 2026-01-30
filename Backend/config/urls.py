@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path
 from apps.infra.auth.views.login_views import LoginApiView
@@ -40,9 +41,16 @@ from apps.movimentacao.views.movimentacao_views import (MovimentacaoCreateAPIVie
 from apps.insumos.views.insumos_views import (InsumoCreateAPIView,
                                               InsumoListAPIView)
 from apps.celular.views.celular_views import (CelularCreateAPIView)
-from apps.soltura.views.remocao_views import (SolturaRemocaoStatsAPIView,
-                                              RemocaoListAPIView)
 from apps.confirmacao.views.confirmacao_views import (ConfirmacaoServicoCreateView)
+from apps.soltura.views.soltura_views import (RemocaoListView,SeletivaListView,
+                                              DomiciliarListView,SolturaAnalyticsRemocaoView
+                                              ,SolturaAnalyticsDomiciliarView,
+                                              SolturaCreateView,
+                                              SolturaAnalyticsSeletivaView)
+from apps.soltura.views.rota_views import (RotaCreateView,RotaListView
+                                           ,RotaDeleteView,RotaUpdateView)
+
+
 
 
 urlpatterns = [
@@ -71,7 +79,16 @@ urlpatterns = [
     path("api/insumos-create/",InsumoCreateAPIView.as_view(),name="InsumosCreate"),
     path("api/insumos-list/",InsumoListAPIView.as_view(),name="InsumosList"),
     path("api/create-celular/",CelularCreateAPIView.as_view(),name="CelularCreate"),
-    path("api/remocao-stats/",SolturaRemocaoStatsAPIView.as_view(),name="RemocaoStats"),
-    path("api/list-remocao/",RemocaoListAPIView.as_view(),name="ListRemocao"),
-    path("api/create-confirmacao/",ConfirmacaoServicoCreateView.as_view(),name="CreateConfirmacao")
+    path("api/create-confirmacao/",ConfirmacaoServicoCreateView.as_view(),name="CreateConfirmacao"),
+    path("api/solturas/create/", SolturaCreateView.as_view()),
+    path("api/solturas/remocao/", RemocaoListView.as_view()),
+    path("api/solturas/seletiva/", SeletivaListView.as_view()),
+    path("api/solturas/domiciliar/", DomiciliarListView.as_view()),
+    path("api/solturas-charts/remocao/",SolturaAnalyticsRemocaoView.as_view(),name="analytics-soltura-remocao",),
+    path("api/solturas-charts/seletiva/",SolturaAnalyticsSeletivaView.as_view(),name="analytics-soltura-seletiva",),
+    path("api/solturas-charts/domiciliar/",SolturaAnalyticsDomiciliarView.as_view(),name="analytics-soltura-domiciliar",),
+    path("api/rota/", RotaCreateView.as_view()),
+    path("api/rota/list/", RotaListView.as_view()),
+    path("api/rota/<int:id_rota>/", RotaUpdateView.as_view()),
+    path("api/rota/<int:id_rota>/delete/", RotaDeleteView.as_view()),
 ]
