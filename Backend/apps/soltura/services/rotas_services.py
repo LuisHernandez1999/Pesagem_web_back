@@ -7,11 +7,9 @@ from apps.soltura.utils.rota_utils import validar_campos_obrigatorios,validar_ro
 
 
 class CriarRotaService:
-
     @staticmethod
     @transaction.atomic
     def executar(dto: RotaCreateDTO) -> RotaDTO:
-
         validar_campos_obrigatorios(dto.garagem, dto.rota, dto.tipo_servico)
         validar_rota_unica( dto.rota, dto.tipo_servico)
 

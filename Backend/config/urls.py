@@ -14,7 +14,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from apps.infra.auth.views.login_views import LoginApiView
@@ -47,8 +48,11 @@ from apps.soltura.views.soltura_views import (RemocaoListView,SeletivaListView,
                                               ,SolturaAnalyticsDomiciliarView,
                                               SolturaCreateView,
                                               SolturaAnalyticsSeletivaView)
+#from apps.soltura.views#
 from apps.soltura.views.rota_views import (RotaCreateView,RotaListView
                                            ,RotaDeleteView,RotaUpdateView)
+from apps.soltura.views.excel_views import (DomiciliarReportView,SeletivaReportView,
+                                            RemocaoReportView,)
 
 
 
@@ -80,15 +84,22 @@ urlpatterns = [
     path("api/insumos-list/",InsumoListAPIView.as_view(),name="InsumosList"),
     path("api/create-celular/",CelularCreateAPIView.as_view(),name="CelularCreate"),
     path("api/create-confirmacao/",ConfirmacaoServicoCreateView.as_view(),name="CreateConfirmacao"),
-    path("api/solturas/create/", SolturaCreateView.as_view()),
-    path("api/solturas/remocao/", RemocaoListView.as_view()),
-    path("api/solturas/seletiva/", SeletivaListView.as_view()),
-    path("api/solturas/domiciliar/", DomiciliarListView.as_view()),
+    path("api/solturas/create/", SolturaCreateView.as_view(),name="CreateService"),
+    path("api/solturas/remocao/", RemocaoListView.as_view(),name="RemocaoList"),
+    path("api/solturas/seletiva/", SeletivaListView.as_view(),name="SeletivaList"),
+    path("api/solturas/domiciliar/", DomiciliarListView.as_view(),name="DomiciliarList"),
     path("api/solturas-charts/remocao/",SolturaAnalyticsRemocaoView.as_view(),name="analytics-soltura-remocao",),
     path("api/solturas-charts/seletiva/",SolturaAnalyticsSeletivaView.as_view(),name="analytics-soltura-seletiva",),
     path("api/solturas-charts/domiciliar/",SolturaAnalyticsDomiciliarView.as_view(),name="analytics-soltura-domiciliar",),
+    path('api/excel/remocao/', RemocaoReportView.as_view(), name='ExcelRemocao'),
+    path('api/excel/domiciliar/', DomiciliarReportView.as_view(), name='ExcelDomiciliar'),
+    path('api/excel/seletiva/', SeletivaReportView.as_view(), name='ExcelSeletiva'),
     path("api/rota/", RotaCreateView.as_view()),
     path("api/rota/list/", RotaListView.as_view()),
     path("api/rota/<int:id_rota>/", RotaUpdateView.as_view()),
     path("api/rota/<int:id_rota>/delete/", RotaDeleteView.as_view()),
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

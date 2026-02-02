@@ -22,8 +22,6 @@ class SolturaServiceCreate:
         return soltura_id
 
 
-
-
 class SolturaListService:
     @staticmethod
     @memoize_with_ttl(ttl_seconds=300)
@@ -47,16 +45,11 @@ class SolturaAnalyticsService:
     @staticmethod
     @memoize_with_ttl(ttl_seconds=300)
     def executar(dto: SolturaAnalyticsFiltroDTO):
-        filtros = Q()  # começa sem filtro
-
-        # Aplica o filtro de tipo de serviço
+        filtros = Q()  
         filtros &= dto.filtro_fn(dto)
-
-        # Aplica status se fornecido
         if dto.status:
             filtros &= Q(status__iexact=dto.status)
         if dto.data_inicio and dto.data_fim:
             filtros &= Q(data_soltura__range=[dto.data_inicio, dto.data_fim])
-
         qs = SolturaAnalyticsQuerySetMapper.build(filtros)
         return SolturaAnalyticsResultMapper.map(qs)
