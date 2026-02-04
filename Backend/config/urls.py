@@ -41,21 +41,18 @@ from apps.movimentacao.views.movimentacao_views import (MovimentacaoCreateAPIVie
                                                         MovimentacaoListAPIView)
 from apps.insumos.views.insumos_views import (InsumoCreateAPIView,
                                               InsumoListAPIView)
-from apps.celular.views.celular_views import (CelularCreateAPIView,CelularListAPIView)
+from apps.celular.views.celular_views import (CelularCreateAPIView,CelularListAPIView,
+                                              CelularDeleteAPIView,CelularUpdateAPIView,)
 from apps.confirmacao.views.confirmacao_views import (ConfirmacaoServicoCreateView)
 from apps.soltura.views.soltura_views import (RemocaoListView,SeletivaListView,
                                               DomiciliarListView,SolturaAnalyticsRemocaoView
                                               ,SolturaAnalyticsDomiciliarView,
                                               SolturaCreateView,
                                               SolturaAnalyticsSeletivaView)
-#from apps.soltura.views#
 from apps.soltura.views.rota_views import (RotaCreateView,RotaListView
                                            ,RotaDeleteView,RotaUpdateView)
 from apps.soltura.views.excel_views import (DomiciliarReportView,SeletivaReportView,
                                             RemocaoReportView,)
-
-
-
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -84,6 +81,8 @@ urlpatterns = [
     path("api/insumos-list/",InsumoListAPIView.as_view(),name="InsumosList"),
     path("api/create-celular/",CelularCreateAPIView.as_view(),name="CelularCreate"),
     path("api/list-celular/",CelularListAPIView.as_view(),name="ListCelular"),
+    path("api/celular/<int:id_celular>/delete/",  CelularDeleteAPIView.as_view(),name="CelularDelete"),
+    path("api/celular/<int:id_celular>/update/",  CelularUpdateAPIView.as_view(),name="CelularUpdate"),
     path("api/create-confirmacao/",ConfirmacaoServicoCreateView.as_view(),name="CreateConfirmacao"),
     path("api/solturas/create/", SolturaCreateView.as_view(),name="CreateService"),
     path("api/solturas/remocao/", RemocaoListView.as_view(),name="RemocaoList"),
@@ -100,7 +99,6 @@ urlpatterns = [
     path("api/rota/<int:id_rota>/", RotaUpdateView.as_view()),
     path("api/rota/<int:id_rota>/delete/", RotaDeleteView.as_view()),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

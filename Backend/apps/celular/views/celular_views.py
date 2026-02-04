@@ -12,6 +12,7 @@ from apps.celular.services.celular_service import (CelularCreateService,CelularL
 from apps.celular.exceptions.celular_exceptions import CelularException
 
 
+
 class CelularCreateAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
     queryset = Celular.objects.none()
