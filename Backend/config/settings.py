@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "apps.insumos.apps.InsumosConfig",
     "apps.soltura.apps.SolturaConfig",
     "apps.confirmacao.apps.ConfirmacaoConfig",
+    "apps.averiguacao.apps.AveriguacaoConfig",
     "rest_framework_simplejwt.token_blacklist",
     "apps.pesagem.apps.PesagemConfig",
     "rest_framework_simplejwt",

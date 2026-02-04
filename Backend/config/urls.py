@@ -41,7 +41,7 @@ from apps.movimentacao.views.movimentacao_views import (MovimentacaoCreateAPIVie
                                                         MovimentacaoListAPIView)
 from apps.insumos.views.insumos_views import (InsumoCreateAPIView,
                                               InsumoListAPIView)
-from apps.celular.views.celular_views import (CelularCreateAPIView)
+from apps.celular.views.celular_views import (CelularCreateAPIView,CelularListAPIView)
 from apps.confirmacao.views.confirmacao_views import (ConfirmacaoServicoCreateView)
 from apps.soltura.views.soltura_views import (RemocaoListView,SeletivaListView,
                                               DomiciliarListView,SolturaAnalyticsRemocaoView
@@ -83,6 +83,7 @@ urlpatterns = [
     path("api/insumos-create/",InsumoCreateAPIView.as_view(),name="InsumosCreate"),
     path("api/insumos-list/",InsumoListAPIView.as_view(),name="InsumosList"),
     path("api/create-celular/",CelularCreateAPIView.as_view(),name="CelularCreate"),
+    path("api/list-celular/",CelularListAPIView.as_view(),name="ListCelular"),
     path("api/create-confirmacao/",ConfirmacaoServicoCreateView.as_view(),name="CreateConfirmacao"),
     path("api/solturas/create/", SolturaCreateView.as_view(),name="CreateService"),
     path("api/solturas/remocao/", RemocaoListView.as_view(),name="RemocaoList"),

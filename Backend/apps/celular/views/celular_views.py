@@ -5,8 +5,10 @@ from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWi
 from rest_framework.response import Response
 from rest_framework import status
 from apps.celular.models.celular import Celular
-from apps.celular.dto.celular_dto import CelularCreateDTO
-from apps.celular.services.celular_service import CelularCreateService
+from apps.celular.dto.celular_dto import (CelularCreateDTO,CelularListRequestDTO,
+                                          CelularDeleteRequestDTO,CelularUpdateRequestDTO)
+from apps.celular.services.celular_service import (CelularCreateService,CelularListService,
+                                                   CelularDeleteService,CelularUpdateService)
 from apps.celular.exceptions.celular_exceptions import CelularException
 
 
@@ -34,3 +36,41 @@ class CelularCreateAPIView(GenericAPIView):
                 {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class CelularListAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    queryset = Celular.objects.none()
+    def get(self, request, *args, **kwargs):
+        request_dto = CelularListRequestDTO(
+            cursor=request.query_params.get("cursor")
+        )
+        response_dto = CelularListService.listar_celulares(request_dto)
+        return Response(
+            asdict(response_dto),
+            status=status.HTTP_200_OK
+        )
+    
+
+class CelularDeleteAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    def delete(self, request, celular_id, *args, **kwargs):
+        dto = CelularDeleteRequestDTO(celular_id=celular_id)
+        response_dto = CelularDeleteService.delete(dto)
+        return Response(
+            asdict(response_dto),
+            status=status.HTTP_200_OK
+        )
+    
+class CelularUpdateAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    def patch(self, request, celular_id, *args, **kwargs):
+        dto = CelularUpdateRequestDTO(
+            celular_id=celular_id,
+            **request.data
+        )
+        response_dto = CelularUpdateService.update(dto)
+        return Response(
+            asdict(response_dto),
+            status=status.HTTP_200_OK
+        )

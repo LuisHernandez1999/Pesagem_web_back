@@ -40,7 +40,7 @@ class BaseReportView(GenericAPIView):
 
         service = self.service_class()
 
-        # 🔥 AGORA É ASSIM
+
         processed_data = service.execute(inicio_dt, final_dt)
 
         nome_arquivo = (

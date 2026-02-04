@@ -1,0 +1,1 @@
+from .averiguacao import Averiguacao

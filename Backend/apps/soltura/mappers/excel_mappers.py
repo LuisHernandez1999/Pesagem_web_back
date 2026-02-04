@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 from collections import Counter, defaultdict
 from apps.soltura.utils.excel_utils import determinar_turno
 from apps.soltura.models.soltura import Soltura
@@ -83,9 +82,6 @@ class SolturaReportProcessMapper:
         rows = []
 
         for s in qs:
-            # -------------------------------
-            # SEM REGRAS DE BLOQUEIO
-            # -------------------------------
             rows.append(map_soltura_to_row(s, tipo_servico))
 
             pa = s.garagem or "Sem Garagem"
