@@ -37,7 +37,6 @@ class RotaListView(GenericAPIView):
             ),
             limit=int(request.query_params.get("limit", 10)),
         )
-
         result = ListarRotaService.executar(dto)
         return Response(asdict(result))
 
