@@ -51,8 +51,11 @@ from apps.soltura.views.soltura_views import (RemocaoListView,SeletivaListView,
                                               SolturaAnalyticsSeletivaView)
 from apps.soltura.views.rota_views import (RotaCreateView,RotaListView
                                            ,RotaDeleteView,RotaUpdateView)
-from apps.soltura.views.excel_views import (DomiciliarReportView,SeletivaReportView,
+from apps.soltura.views.excel.excel_views import (DomiciliarReportView,SeletivaReportView,
                                             RemocaoReportView,)
+from apps.soltura.views.excel.excel_status_views import ReportStatusView
+from apps.soltura.views.excel.excel_download_views import ReportDownloadView
+from apps.averiguacao.views.averiguacao_views import AveriguacaoEstatisticasSemanaView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -94,10 +97,14 @@ urlpatterns = [
     path('api/excel/remocao/', RemocaoReportView.as_view(), name='ExcelRemocao'),
     path('api/excel/domiciliar/', DomiciliarReportView.as_view(), name='ExcelDomiciliar'),
     path('api/excel/seletiva/', SeletivaReportView.as_view(), name='ExcelSeletiva'),
+    path("reports/status/<uuid:task_id>/",ReportStatusView.as_view(),name="relatorio-status"),
+    path("reports/download/<str:nome_arquivo>/",ReportDownloadView.as_view(),name="relatorio-download"),
     path("api/rota/", RotaCreateView.as_view()),
     path("api/rota/list/", RotaListView.as_view()),
     path("api/rota/<int:id_rota>/", RotaUpdateView.as_view()),
     path("api/rota/<int:id_rota>/delete/", RotaDeleteView.as_view()),
+    path("api/averiguacao-semanal/",AveriguacaoEstatisticasSemanaView.as_view(),name='AveriguacaoLIstSemanal'),
+
 ]
 
 if settings.DEBUG:

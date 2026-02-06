@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import GenericAPIView
 from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
@@ -9,7 +10,8 @@ from apps.soltura.dto.rota_dtos import (
     RotaUpdateDTO,
     RotaListFiltroDTO,
 )
-from apps.soltura.services.rotas_services import CriarRotaService,AtualizarRotaService,DeletarRotaService,ListarRotaService
+from apps.soltura.services.rotas_services import (CriarRotaService,AtualizarRotaService
+                                                  ,DeletarRotaService,ListarRotaService)
 
 
 
@@ -24,11 +26,20 @@ class RotaCreateView(GenericAPIView):
 
 class RotaListView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
-    queryset = Rota.objects.none()
     def get(self, request):
-        dto = RotaListFiltroDTO(**request.query_params)
-        rotas = ListarRotaService.executar(dto)
-        return Response([r.__dict__ for r in rotas])
+        dto = RotaListFiltroDTO(
+            pa=request.query_params.get("pa"),
+            tipo_servico=request.query_params.get("tipo_servico"),
+            cursor=(
+                int(request.query_params["cursor"])
+                if "cursor" in request.query_params
+                else None
+            ),
+            limit=int(request.query_params.get("limit", 10)),
+        )
+
+        result = ListarRotaService.executar(dto)
+        return Response(asdict(result))
 
 
 class RotaUpdateView(GenericAPIView):

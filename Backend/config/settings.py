@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     "apps.infra.auth.apps.AuthConfig",  # Movido para o topo para garantir que o modelo de usuário customizado seja carregado primeiro
     "apps.veiculo.apps.VeiculoConfig",
     "apps.colaborador.apps.ColaboradorConfig",
+    "django_celery_results",
     "apps.cooperativa.apps.CooperativaConfig",
     "apps.os.apps.OrdemDeServicoConfig",
     "apps.movimentacao.apps.MovimentacaoConfig",
@@ -37,6 +38,17 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
+
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_BACKEND = "django-db"
+
+CELERY_TIMEZONE = "America/Sao_Paulo"
+
+
+
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

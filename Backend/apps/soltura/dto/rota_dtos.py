@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional,List
 
 
 @dataclass
@@ -21,6 +21,13 @@ class RotaUpdateDTO:
 class RotaListFiltroDTO:
     pa: Optional[str] = None
     tipo_servico: Optional[str] = None
+    cursor: Optional[int] = None
+    limit: int = 10
+
+@dataclass
+class RotaListResponseDTO:
+    items: List["RotaDTO"]
+    next_cursor: Optional[int]
 
 
 @dataclass

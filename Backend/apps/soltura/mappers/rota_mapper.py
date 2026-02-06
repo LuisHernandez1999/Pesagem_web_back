@@ -12,6 +12,16 @@ class RotaMapper:
             tipo_servico=model.tipo_servico,
         )
 
+class RotaMapperList:
+    @staticmethod
+    def to_dto(model: Rota) -> RotaDTO:
+        return RotaDTO(
+            id_rota=model.id,
+            pa=model.pa,
+            rota=model.rota,
+            tipo_servico=model.tipo_servico,
+        )
+
     @staticmethod
     def to_dto_list(qs) -> list[RotaDTO]:
-        return [RotaMapper.to_dto(obj) for obj in qs]
+        return [RotaMapperList.to_dto(obj) for obj in qs]
