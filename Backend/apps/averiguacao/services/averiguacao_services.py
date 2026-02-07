@@ -1,12 +1,16 @@
 from apps.averiguacao.mappers.averiguacao_mapper import AveriguacaoCreateMapper,AveriguacaoEstatisticasSemanaMapper
-from apps.averiguacao.dto.averiguacao_dto import(AveriguacaoCreateDTO,AveriguacaoEstatisticasSemanaResponseDTO
+from apps.averiguacao.dto.averiguacao_dto import(AveriguacaoCreateRequestDTO,AveriguacaoEstatisticasSemanaResponseDTO
                                                  ,MetaSemanaResponseDTO)
 from django.db import transaction
+from django.db import transaction
+from  apps.averiguacao.utils.averiguacao_utils  import validar_campos_obrigatorios
+
 
 class AveriguacaoServiceCreate:
     @staticmethod
     @transaction.atomic
-    def create(dto: AveriguacaoCreateDTO) -> int:
+    def create(dto: AveriguacaoCreateRequestDTO) -> int:
+        validar_campos_obrigatorios(dto)
         return AveriguacaoCreateMapper.insert(dto)
     
 

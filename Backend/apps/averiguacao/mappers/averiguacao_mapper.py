@@ -1,7 +1,7 @@
 import datetime
 from django.db.models import Q, Count
 from apps.averiguacao.models.averiguacao import Averiguacao
-from apps.averiguacao.dto.averiguacao_dto import AveriguacaoCreateDTO
+from apps.averiguacao.dto.averiguacao_dto import AveriguacaoCreateRequestDTO,AveriguacaoResponseDTO
 from apps.averiguacao.utils.averiguacao_utils import (
     PA_ESTABELECIDAS,
     METAS_SEMANAIS,
@@ -11,28 +11,44 @@ from apps.averiguacao.utils.averiguacao_utils import (
 
 class AveriguacaoCreateMapper:
     @staticmethod
-    def insert(dto: AveriguacaoCreateDTO) -> int:
+    def insert(dto: AveriguacaoCreateRequestDTO) -> int:
         averiguacao = Averiguacao.objects.create(
             tipo_servico=dto.tipo_servico,
             pa_da_averiguacao=dto.pa_da_averiguacao,
-            data=dto.data,
-            hora_averiguacao=dto.hora_da_averiguacao,
-            rota_da_averiguacao=dto.rota_da_averiguacao,
-            imagem1=dto.imagem1,
-            imagem2=dto.imagem2,
-            imagem3=dto.imagem3,
-            imagem4=dto.imagem4,
-            imagem5=dto.imagem5,
-            imagem6=dto.imagem6,
-            imagem7=dto.imagem7,
+            rota_averiguada_id=dto.rota_averiguada_id,
+            averiguador=dto.averiguador,
+            formulario=dto.formulario,
         )
         return averiguacao.id
+    
+
+class AveriguacaoResponseMapper:
+    @staticmethod
+    def from_model(obj: Averiguacao) -> AveriguacaoResponseDTO:
+        return AveriguacaoResponseDTO(
+            id=obj.id,
+            tipo_servico=obj.tipo_servico,
+            pa_da_averiguacao=obj.pa_da_averiguacao,
+            data=obj.data,
+            hora_averiguacao=obj.hora_averiguacao,
+            rota_averiguada_id=obj.rota_averiguada_id,
+
+            imagem1=obj.imagem1.url if obj.imagem1 else None,
+            imagem2=obj.imagem2.url if obj.imagem2 else None,
+            imagem3=obj.imagem3.url if obj.imagem3 else None,
+            imagem4=obj.imagem4.url if obj.imagem4 else None,
+            imagem5=obj.imagem5.url if obj.imagem5 else None,
+            imagem6=obj.imagem6.url if obj.imagem6 else None,
+            imagem7=obj.imagem7.url if obj.imagem7 else None,
+
+            averiguador=obj.averiguador,
+            formulario=obj.formulario,
+        )
 
 class AveriguacaoEstatisticasSemanaMapper:
     @classmethod
     def map_cards_semana(cls, pa, turno, servico, data_inicio=None, data_fim=None):
         inicio, fim = calcular_periodo_semana(data_inicio, data_fim)
-
         filtro = Q(
             tipo_servico=servico,
             data__range=(inicio, fim),
@@ -43,7 +59,6 @@ class AveriguacaoEstatisticasSemanaMapper:
 
         if turno:
             filtro &= Q(rota_averiguada__turno=turno)
-
         queryset = (
             Averiguacao.objects
             .filter(filtro)

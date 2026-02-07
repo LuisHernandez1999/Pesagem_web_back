@@ -1,25 +1,26 @@
 from dataclasses import  dataclass
-from datetime import date,datetime
+from datetime import date,datetime,time
 from typing import Dict,Optional
 
 
 @dataclass
-class AveriguacaoCreateDTO:
-    tipo_servico: str 
-    pa_da_averiguacao:str
-    data:date
-    hora_averiguacao:datetime
-    rota_da_averiguacao:str
-    imagem1:str
-    imagem2:str
-    imagem3:str
-    imagem4:str
-    imagem5:str
-    imagem6:str
-    imagem7:str
-    averiguador:str
-    formulario:str
+class AveriguacaoCreateRequestDTO:
+    tipo_servico: str
+    pa_da_averiguacao: str
+    rota_averiguada_id: int
+    averiguador: str
+    formulario: str | None
 
+@dataclass
+class AveriguacaoResponseDTO:
+    id: int
+    tipo_servico: str
+    pa_da_averiguacao: str
+    data: date
+    hora_averiguacao: time
+    rota_averiguada_id: int | None
+    averiguador: str
+    formulario: str | None
 
 @dataclass
 class AveriguacaoEstatisticasSemanaRequestDTO:

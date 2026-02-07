@@ -14,8 +14,9 @@ ROLES = {
         "soltura.soltura":["view", "add", "change", "delete"],
         "soltura.rota":["view", "add", "change", "delete"],
         "soltura.setor":["view", "add", "change", "delete"],
-        "confirmacao.confirmacaoservico": ["view", "add", "change", "delete"]
-,
+        "confirmacao.confirmacaoservico": ["view", "add", "change", "delete"],
+        "averiguacao.averiguacao": ["view", "add", "change", "delete"],
+
     },
 }
 
