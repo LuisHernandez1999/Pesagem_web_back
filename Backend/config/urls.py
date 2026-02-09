@@ -55,7 +55,10 @@ from apps.soltura.views.excel.excel_views import (DomiciliarReportView,SeletivaR
                                             RemocaoReportView,)
 from apps.soltura.views.excel.excel_status_views import ReportStatusView
 from apps.soltura.views.excel.excel_download_views import ReportDownloadView
-from apps.averiguacao.views.averiguacao_views import AveriguacaoEstatisticasSemanaApiView,AveriguacaoCreateApiView
+from apps.averiguacao.views.averiguacao_views import (AveriguacaoEstatisticasSemanaApiView,
+                                                      AveriguacaoCreateApiView,
+                                                      AveriguacaoListApiView,
+                                                      AveriguacaoDetailApiView)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -104,6 +107,8 @@ urlpatterns = [
     path("api/rota/<int:id_rota>/", RotaUpdateView.as_view()),
     path("api/rota/<int:id_rota>/delete/", RotaDeleteView.as_view()),
     path("api/averiguacao-semanal/",AveriguacaoEstatisticasSemanaApiView.as_view(),name='AveriguacaoLIstSemanal'),
+    path("api/averiguacao-list/",AveriguacaoListApiView.as_view(),name='AveriguacaoList'),
+    path('api/averiguacao/<int:id>/', AveriguacaoDetailApiView.as_view(), name='averiguacao-detail'),
     path("api/create-averiguacao/",AveriguacaoCreateApiView.as_view(),name="CreateAveriguacao")
 
 ]

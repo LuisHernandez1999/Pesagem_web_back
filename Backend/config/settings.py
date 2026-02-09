@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "apps.pesagem.apps.PesagemConfig",
     "rest_framework_simplejwt",
+    "rest_framework",
     "corsheaders",
     # Django
     "django.contrib.admin",
@@ -127,8 +128,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework_orjson.renderers.ORJSONRenderer",
+    ),
 }
-
 DEFAULT_USER_GROUP = "default"
 
 DEFAULT_USER_GROUP = "default"

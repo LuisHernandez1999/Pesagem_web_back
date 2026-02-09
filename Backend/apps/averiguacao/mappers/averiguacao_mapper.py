@@ -1,106 +1,145 @@
-import datetime
+from datetime import datetime, timedelta,timezone
+from django.utils import timezone
+import json
 from django.db.models import Q, Count
 from apps.averiguacao.models.averiguacao import Averiguacao
-from apps.averiguacao.dto.averiguacao_dto import AveriguacaoCreateRequestDTO,AveriguacaoResponseDTO
+from apps.soltura.models.soltura import Soltura
+from apps.averiguacao.dto.averiguacao_dto import AveriguacaoItemDTO,MotoristaDTO,AveriguacaoDTO,ColetorDTO
 from apps.averiguacao.utils.averiguacao_utils import (
     PA_ESTABELECIDAS,
     METAS_SEMANAIS,
-    calcular_periodo_semana,
-)
+    )
 
 
-class AveriguacaoCreateMapper:
+
+
+class CriarAveriguacaoMapper:
+
     @staticmethod
-    def insert(dto: AveriguacaoCreateRequestDTO) -> int:
-        averiguacao = Averiguacao.objects.create(
+    def dto_para_model(dto):
+        return Averiguacao(
+            rota_averiguada_id=dto.rota_id,
             tipo_servico=dto.tipo_servico,
             pa_da_averiguacao=dto.pa_da_averiguacao,
-            rota_averiguada_id=dto.rota_averiguada_id,
             averiguador=dto.averiguador,
             formulario=dto.formulario,
+            imagem1=dto.imagem1,
+            imagem2=dto.imagem2,
+            imagem3=dto.imagem3,
+            imagem4=dto.imagem4,
+            imagem5=dto.imagem5,
+            imagem6=dto.imagem6,
+            imagem7=dto.imagem7,
         )
-        return averiguacao.id
     
 
-class AveriguacaoResponseMapper:
+
+class AveriguacaoSemanaMapper:
+
     @staticmethod
-    def from_model(obj: Averiguacao) -> AveriguacaoResponseDTO:
-        return AveriguacaoResponseDTO(
-            id=obj.id,
-            tipo_servico=obj.tipo_servico,
-            pa_da_averiguacao=obj.pa_da_averiguacao,
-            data=obj.data,
-            hora_averiguacao=obj.hora_averiguacao,
-            rota_averiguada_id=obj.rota_averiguada_id,
+    def to_cards_por_dia(averiguacoes, inicio_semana, fim_semana):
+        # Inicializa dias e PA com zero
+        dias_da_semana = [(inicio_semana + timedelta(days=i)).isoformat() for i in range((fim_semana - inicio_semana).days + 1)]
+        cards_por_dia = {dia: {pa: 0 for pa in PA_ESTABELECIDAS} for dia in dias_da_semana}
 
-            imagem1=obj.imagem1.url if obj.imagem1 else None,
-            imagem2=obj.imagem2.url if obj.imagem2 else None,
-            imagem3=obj.imagem3.url if obj.imagem3 else None,
-            imagem4=obj.imagem4.url if obj.imagem4 else None,
-            imagem5=obj.imagem5.url if obj.imagem5 else None,
-            imagem6=obj.imagem6.url if obj.imagem6 else None,
-            imagem7=obj.imagem7.url if obj.imagem7 else None,
+        for pa_val, data_val in averiguacoes:
+            dia_str = data_val.isoformat()
+            if dia_str in cards_por_dia:
+                cards_por_dia[dia_str][pa_val] += 1
 
-            averiguador=obj.averiguador,
-            formulario=obj.formulario,
-        )
+        return cards_por_dia
 
-class AveriguacaoEstatisticasSemanaMapper:
-    @classmethod
-    def map_cards_semana(cls, pa, turno, servico, data_inicio=None, data_fim=None):
-        inicio, fim = calcular_periodo_semana(data_inicio, data_fim)
-        filtro = Q(
-            tipo_servico=servico,
-            data__range=(inicio, fim),
-        )
-
-        if pa:
-            filtro &= Q(pa_da_averiguacao=pa)
-
-        if turno:
-            filtro &= Q(rota_averiguada__turno=turno)
-        queryset = (
-            Averiguacao.objects
-            .filter(filtro)
-            .values("data", "pa_da_averiguacao")
-            .annotate(total=Count("id"))
-        )
-
-        dias = [
-            (inicio + datetime.timedelta(days=i)).isoformat()
-            for i in range(7)
-        ]
-
-        cards_por_dia = {
-            dia: {pa: 0 for pa in PA_ESTABELECIDAS}
-            for dia in dias
-        }
-
-        for row in queryset:
-            dia = row["data"].isoformat()
-            cards_por_dia[dia][row["pa_da_averiguacao"]] = row["total"]
-
-        return cards_por_dia, inicio, fim
-
-    @classmethod
-    def map_meta(cls, servico, cards_por_dia):
+    @staticmethod
+    def to_meta(cards_por_dia, servico):
         meta_total = METAS_SEMANAIS.get(servico, 0)
-
-        total_realizado = sum(
-            qtd for dia in cards_por_dia.values()
-            for qtd in dia.values()
-        )
-
+        total_realizado = sum(qtd for dia in cards_por_dia.values() for qtd in dia.values())
         total_faltante = max(meta_total - total_realizado, 0)
+        perc_realizado = (total_realizado / meta_total * 100) if meta_total > 0 else 0
+        perc_faltante = (total_faltante / meta_total * 100) if meta_total > 0 else 0
 
         return {
             "total": meta_total,
             "realizado": total_realizado,
-            "percentual_realizado": round(
-                (total_realizado / meta_total) * 100, 2
-            ) if meta_total else 0,
+            "percentual_realizado": round(perc_realizado, 2),
             "faltante": total_faltante,
-            "percentual_faltante": round(
-                (total_faltante / meta_total) * 100, 2
-            ) if meta_total else 0,
+            "percentual_faltante": round(perc_faltante, 2),
         }
+    
+
+
+class AveriguacaoListMapper:
+
+    @staticmethod
+    def dict_to_dto(obj: dict) -> AveriguacaoItemDTO:
+        # Garante que formulario é dict
+        formulario_raw = obj.get("formulario") or "{}"
+        if isinstance(formulario_raw, str):
+            try:
+                formulario = json.loads(formulario_raw)
+            except json.JSONDecodeError:
+                formulario = {}
+        else:
+            formulario = formulario_raw
+
+        # Contagem de não conformes e inadequados
+        nao_conformes = sum(1 for v in formulario.values() if str(v).lower() == "não conforme")
+        inadequados = sum(1 for v in formulario.values() if str(v).lower() == "inadequado")
+        detalhes_nao_conformes = [k for k, v in formulario.items() if str(v).lower() == "não conforme"]
+        detalhes_inadequados = [k for k, v in formulario.items() if str(v).lower() == "inadequado"]
+
+        # Define rota (rota ou setor)
+        rota = obj.get("rota") or ""
+
+        return AveriguacaoItemDTO(
+            id=obj["id"],
+            data=obj["data"].isoformat() if hasattr(obj["data"], "isoformat") else obj["data"],
+            averiguador=obj.get("averiguador"),
+            pa_da_averiguacao=obj.get("pa_da_averiguacao"),
+            tipo_servico=obj.get("tipo_servico"),
+            formulario=formulario,
+            soltura_id=obj.get("soltura_id"),
+            rota_id=obj.get("rota_id"),
+            rota=rota,
+            nao_conformes=nao_conformes,
+            inadequados=inadequados,
+            detalhes_nao_conformes=detalhes_nao_conformes,
+            detalhes_inadequados=detalhes_inadequados
+        )
+
+    @staticmethod
+    def list_to_dto(objs: list) -> list:
+        return [AveriguacaoListMapper.dict_to_dto(obj) for obj in objs]
+    
+
+class AveriguacaoByIDMapper:
+    @staticmethod
+    def model_to_dto(registro_obj) -> AveriguacaoDTO:
+        # Motorista
+        motorista = None
+        if registro_obj.rota_averiguada.motorista:
+            motorista = MotoristaDTO(
+                nome=registro_obj.rota_averiguada.motorista.nome,
+                matricula=registro_obj.rota_averiguada.motorista.matricula
+            )
+
+        # Coletores
+        coletores = [
+            ColetorDTO(nome=c.nome, matricula=c.matricula)
+            for c in registro_obj.rota_averiguada.coletores.all()
+        ]
+
+        # Imagens
+        imagens = [
+            getattr(registro_obj, f"imagem{i}").url
+            for i in range(1, 8)
+            if getattr(registro_obj, f"imagem{i}")
+        ]
+
+        return AveriguacaoDTO(
+            id=registro_obj.id,
+            formulario=registro_obj.formulario or {},
+            imagens=imagens,
+            motorista=motorista,
+            coletores=coletores,
+            prefixo_veiculo=registro_obj.rota_averiguada.veiculo.prefixo if registro_obj.rota_averiguada.veiculo else None
+        )

@@ -1,8 +1,8 @@
 import datetime
-from dataclasses import fields
 from django.utils import timezone
-from dataclasses import fields
-from typing import get_origin, get_args, Union
+from django.shortcuts import get_object_or_404
+from apps.soltura.models.soltura import Soltura
+from apps.averiguacao.dto.averiguacao_dto import AveriguacaoCreateRequestDTO
 PA_ESTABELECIDAS = ("PA1", "PA2", "PA3", "PA4")
 
 METAS_SEMANAIS = {
@@ -10,27 +10,6 @@ METAS_SEMANAIS = {
     "Domiciliar": 100,
     "Seletiva": 90,
 }
-
-
-
-def validar_campos_obrigatorios(dto) -> None:
-    faltantes = []
-
-    for field in fields(dto):
-        tipo = field.type
-        valor = getattr(dto, field.name)
-
-        is_optional = (
-            get_origin(tipo) is Union and type(None) in get_args(tipo)
-        )
-
-        if not is_optional and valor is None:
-            faltantes.append(field.name)
-
-    if faltantes:
-        raise ValueError(
-            f"Campos obrigatórios ausentes: {', '.join(faltantes)}"
-        )
 
 def calcular_periodo_semana(data_inicio=None, data_fim=None):
     hoje = timezone.localdate()
@@ -46,14 +25,27 @@ def calcular_periodo_semana(data_inicio=None, data_fim=None):
     return inicio, fim
 
 
-def validar_obrigatorios_por_dto(dto) -> None:
-    faltantes = [
-        field.name
-        for field in fields(dto)
-        if getattr(dto, field.name) is None
-    ]
 
-    if faltantes:
-        raise ValueError(
-            f"Campos obrigatórios ausentes: {', '.join(faltantes)}"
-        )
+
+def buscar_soltura(rota_id: int) -> Soltura:
+    if not rota_id:
+        raise ValueError("Rota é obrigatória")
+
+    return get_object_or_404(Soltura, id=rota_id)
+
+
+def validar_minimo_imagens(dto: AveriguacaoCreateRequestDTO, minimo: int = 2) -> None:
+    imagens = (
+        dto.imagem1,
+        dto.imagem2,
+        dto.imagem3,
+        dto.imagem4,
+        dto.imagem5,
+        dto.imagem6,
+        dto.imagem7,
+    )
+
+    qtd = sum(1 for img in imagens if img is not None)
+
+    if qtd < minimo:
+        raise ValueError(f"É obrigatório enviar pelo menos {minimo} imagens")
