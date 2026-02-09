@@ -25,7 +25,6 @@ class CooperativaMapperCreate:
 
 
 
-
 class CooperativaEficienciaMapper:
     @staticmethod
     def get(dto):

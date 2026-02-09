@@ -3,16 +3,19 @@ from rest_framework.permissions import IsAuthenticated
 from apps.infra.auth.permissions.drf_permissions import DjangoModelPermissionsWithView
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from django.http import HttpResponse
-from apps.pesagem.dto.pesagem_dto import CreatePesagemDTO,PesagemListDTO,ExibirPesagemPorMesDTO,PesagemCreateDocDTO
+from apps.pesagem.dto.pesagem_dto import (CreatePesagemDTO,PesagemListDTO
+                                          ,ExibirPesagemPorMesDTO
+                                          ,PesagemCreateDocDTO)
 from apps.pesagem.service.pesagem_service import (PesagemServiceCreate
                                                   ,PesagemServiceListTipo, 
-                                                  PesagemListService,ExibirPesagemPorMesService,
-                                                  PesagemServiceDoc)
+                                                  PesagemListService
+                                                  ,ExibirPesagemPorMesService )
+                                               
 from apps.pesagem.exceptions.pesagem_execptions import PesagemException
 from apps.pesagem.models.pesagem import Pesagem
-from apps.pesagem.documents.doc_generator import PesagemExcelDocument
+from apps.pesagem.tasks.pesagem_task import gerar_relatorio_pesagem_task
 from rest_framework import status
+from celery.result import AsyncResult
 
 
 class PesagemCreateApiView(GenericAPIView):
@@ -57,9 +60,6 @@ class PesagemListApiView(GenericAPIView):
         result = PesagemListService.execute(dto)
         return Response(result)
 
-   
-    
-
 class ExibirPesagemPorMesAPIView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
     queryset = Pesagem.objects.none()
@@ -72,14 +72,6 @@ class ExibirPesagemPorMesAPIView(GenericAPIView):
         result = ExibirPesagemPorMesService.execute(dto)
         return Response(result, status=200)
 
-
-
-
-
-
-
-
-
 class PesagemTipoServicoView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
     queryset = Pesagem.objects.none()
@@ -87,7 +79,6 @@ class PesagemTipoServicoView(GenericAPIView):
         try:
             total_seletiva = PesagemServiceListTipo.total_seletiva()
             total_cata_treco = PesagemServiceListTipo.total_cata_treco()
-
             return Response(
                 {
                     "SELETIVA": total_seletiva,
@@ -118,17 +109,26 @@ class PesagemGerarDocumentoAPIView(GenericAPIView):
             garagem=request.query_params.get("garagem"),
             turno=request.query_params.get("turno"),
         )
+        task = gerar_relatorio_pesagem_task.delay(dto.__dict__)
 
-        dados = PesagemServiceDoc.executar(dto)
-        wb = PesagemExcelDocument.gerar(dados)
-        response = HttpResponse(
-            content_type=(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-        )
-        response["Content-Disposition"] = (
-            'attachment; filename="relatorio_pesagens.xlsx"'
-        )
+        return Response({
+            "message": "Relatório está sendo gerado",
+            "task_id": task.id
+        }, status=status.HTTP_202_ACCEPTED)
 
-        wb.save(response)
-        return response
+
+class PesagemRelatorioStatusAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
+    queryset = Pesagem.objects.none()
+    def get(self, request, task_id):
+        task_result = AsyncResult(task_id)
+
+        if task_result.status == 'SUCCESS':
+            return Response({
+                "status": task_result.status,
+                "file_path": task_result.result
+            })
+        else:
+            return Response({
+                "status": task_result.status
+            })
