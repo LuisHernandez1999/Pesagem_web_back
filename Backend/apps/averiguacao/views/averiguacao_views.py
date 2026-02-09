@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from django.http import HttpResponse
 from dataclasses import asdict
-from datetime import  date
+from datetime import datetime, timedelta,date
 import orjson
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_orjson.renderers import ORJSONRenderer
@@ -12,7 +12,8 @@ from apps.averiguacao.services.averiguacao_services import (
     AveriguacaoSemanaService,
     CriarAveriguacaoService,
     AveriguacaoListService,
-    AveriguacaoByIDService
+    AveriguacaoByIDService,
+    AveriguacaoReportService
 )
 from apps.averiguacao.dto.averiguacao_dto import (
     AveriguacaoCreateRequestDTO,
@@ -42,9 +43,8 @@ class AveriguacaoCreateApiView(GenericAPIView):
             )
 
             response_dto: AveriguacaoCreateResponseDTO = CriarAveriguacaoService.executar(dto)
-
             return HttpResponse(
-                content=orjson.dumps(response_dto.__dict__),  #  orjson
+                content=orjson.dumps(response_dto.__dict__),  
                 content_type="application/json",
                 status=201
             )
@@ -151,3 +151,41 @@ class AveriguacaoDetailApiView(GenericAPIView):
         result_dict = asdict(result_dto)
         json_bytes = orjson.dumps(result_dict, option=orjson.OPT_PASSTHROUGH_DATACLASS)
         return HttpResponse(json_bytes, content_type="application/json", status=200)
+    
+
+
+
+class AveriguacaoReportApiView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    renderer_classes = (ORJSONRenderer,)
+    queryset = Averiguacao.objects.none()
+    def get(self, request):
+        params = request.GET
+        pa_list = params.get("pa", "")
+        pa_list = [p.strip() for p in pa_list.split(",")] if pa_list else None
+        semana_str = params.get("semana")
+        if semana_str:
+            try:
+                data_inicio = datetime.strptime(semana_str, "%Y-%m-%d").date()
+            except ValueError:
+                return HttpResponse("Formato de data inválido. Use YYYY-MM-DD.", status=400)
+        else:
+            hoje = datetime.today().date()
+            data_inicio = hoje - timedelta(days=hoje.weekday() + 7)  
+        data_fim = data_inicio + timedelta(days=6)
+        report_dto = AveriguacaoReportService.gerar_relatorio(
+            pa=pa_list,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            turno=params.get("turno"),
+            servico=params.get("servico", "Remoção"),
+            dia_semana=params.get("dia_semana"),
+            cursor=params.get("cursor"),
+            direction=params.get("direction", "next"),
+            limit=int(params.get("limit", 50))
+        )
+        return HttpResponse(
+            orjson.dumps(asdict(report_dto), option=orjson.OPT_PASSTHROUGH_DATACLASS),
+            content_type="application/json",
+            status=200
+        )

@@ -58,7 +58,8 @@ from apps.soltura.views.excel.excel_download_views import ReportDownloadView
 from apps.averiguacao.views.averiguacao_views import (AveriguacaoEstatisticasSemanaApiView,
                                                       AveriguacaoCreateApiView,
                                                       AveriguacaoListApiView,
-                                                      AveriguacaoDetailApiView)
+                                                      AveriguacaoDetailApiView,
+                                                      AveriguacaoReportApiView)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -109,9 +110,11 @@ urlpatterns = [
     path("api/averiguacao-semanal/",AveriguacaoEstatisticasSemanaApiView.as_view(),name='AveriguacaoLIstSemanal'),
     path("api/averiguacao-list/",AveriguacaoListApiView.as_view(),name='AveriguacaoList'),
     path('api/averiguacao/<int:id>/', AveriguacaoDetailApiView.as_view(), name='averiguacao-detail'),
-    path("api/create-averiguacao/",AveriguacaoCreateApiView.as_view(),name="CreateAveriguacao")
+    path("api/create-averiguacao/",AveriguacaoCreateApiView.as_view(),name="CreateAveriguacao"),
+    path("api/report-averiguacao/",AveriguacaoReportApiView.as_view(),name="ReportAveriguacao")
 
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    

@@ -86,3 +86,37 @@ class AveriguacaoResponseDTO:
     data: List[AveriguacaoDTO]
     message: Optional[str] = None
     error: Optional[str] = None
+
+
+
+@dataclass
+class VistoriaDTO:
+    vistoria_id: int
+    rota_nome: str
+    pa: str
+    taxas: Dict[str, Dict]
+
+@dataclass
+class LiderDTO:
+    averiguador: str
+    total_averiguacoes: int
+    pas: List[str]
+    rotas_setores: List[str]
+    tipos_servico: List[str]
+    turnos: List[str]
+    dias_semana: List[str]
+
+@dataclass
+class ReportAveriguacaoDTO:
+    periodo: str
+    pa: Optional[str]
+    turno: Optional[str]
+    servico: str
+    dias_semana: List[str]
+    total_respostas: int
+    conformidade_servico: Dict
+    total_nao_conformes: int
+    vistorias: List[VistoriaDTO]
+    lideres: List[LiderDTO]
+    next_cursor: Optional[int]
+    previous_cursor: Optional[int]

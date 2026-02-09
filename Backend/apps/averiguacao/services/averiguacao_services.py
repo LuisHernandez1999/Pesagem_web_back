@@ -1,14 +1,24 @@
 from apps.averiguacao.mappers.averiguacao_mapper import (CriarAveriguacaoMapper,
-                                                         AveriguacaoSemanaMapper,AveriguacaoListMapper,
-                                                         AveriguacaoByIDMapper)
+                                                         AveriguacaoSemanaMapper,
+                                                         AveriguacaoListMapper,
+                                                         AveriguacaoByIDMapper,
+                                                         AveriguacaoReportMapper)
 from apps.averiguacao.dto.averiguacao_dto import(AveriguacaoCreateRequestDTO,
-                                                AveriguacaoCreateResponseDTO,AveriguacaoListResponseDTO,
-                                                AveriguacaoResponseDTO, )
+                                                AveriguacaoCreateResponseDTO,
+                                                AveriguacaoListResponseDTO,
+                                                AveriguacaoResponseDTO,
+                                               )
 from django.db import transaction,connection
 from apps.averiguacao.models.averiguacao import Averiguacao
 from datetime import  timedelta,timezone
 from django.db.models import Q
 from django.utils import timezone
+import json
+from apps.averiguacao.query.averiguacao_queries import AveriguacaoQuery
+from apps.averiguacao.mappers.averiguacao_mapper import AveriguacaoReportMapper
+from apps.averiguacao.dto.averiguacao_dto import  ReportAveriguacaoDTO
+
+
 
 TIPOS_SERVICO = ['Seletiva', 'Remoção', 'Domiciliar']
 
@@ -130,3 +140,93 @@ class AveriguacaoByIDService:
                 message="Erro ao buscar averiguação.",
                 error=str(e)
             )
+        
+
+class AveriguacaoReportService:
+    @staticmethod
+    def gerar_relatorio(pa=None, data_inicio=None, data_fim=None, turno=None, servico="Remoção", dia_semana=None, cursor=None, direction="next", limit=50) -> ReportAveriguacaoDTO:
+
+        registros, total = AveriguacaoQuery.buscar_averiguacoes(
+            pa=pa,
+            turno=turno,
+            servico=servico,
+            dia_semana=dia_semana,
+            cursor=cursor,
+            direction=direction,
+            limit=limit,
+            data_inicio=data_inicio,
+            data_fim=data_fim
+        )
+
+
+        vistorias = []
+        registros_com_problema = 0
+        for avg in registros[:limit]:
+            campos_nao_conformes = []
+            campos_inadequados = []
+
+            if avg.formulario:
+                try:
+                    formulario = json.loads(avg.formulario)
+                except:
+                    formulario = {}
+                for campo, valor in formulario.items():
+                    val_lower = str(valor).lower()
+                    if val_lower == "não conforme":
+                        campos_nao_conformes.append(campo)
+                    elif val_lower == "inadequado":
+                        campos_inadequados.append(campo)
+
+            if campos_nao_conformes or campos_inadequados:
+                registros_com_problema += 1
+            vistorias.append(AveriguacaoReportMapper.to_vistoria_dto(avg, campos_nao_conformes, campos_inadequados))
+        taxa_geral = ((total - registros_com_problema) / total * 100) if total else 0
+        lideres_dict = {}
+        for avg in registros[:limit]:
+            key = avg.averiguador
+            if key not in lideres_dict:
+                lideres_dict[key] = {
+                    "total": 0,
+                    "pas": set(),
+                    "rotas_setores": set(),
+                    "tipos_servico": set(),
+                    "turnos": set()
+                }
+            lideres_dict[key]["total"] += 1
+            lideres_dict[key]["pas"].add(avg.pa_da_averiguacao)
+            lideres_dict[key]["rotas_setores"].add(getattr(avg, "rota_nome", ""))
+            lideres_dict[key]["tipos_servico"].add(avg.tipo_servico)
+            lideres_dict[key]["turnos"].add(getattr(avg.rota_averiguada, "turno", ""))
+
+        lideres = [
+            AveriguacaoReportMapper.to_lider_dto(
+                averiguador=k,
+                total=v["total"],
+                pas=list(v["pas"]),
+                rotas_setores=list(v["rotas_setores"]),
+                tipos_servico=list(v["tipos_servico"]),
+                turnos=list(v["turnos"]),
+                dias_semana=[dia_semana.capitalize()] if dia_semana else ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"]
+            )
+            for k, v in lideres_dict.items()
+        ]
+        next_cursor = registros[-1].id if registros else None
+        prev_cursor = registros[0].id if registros else None
+        return ReportAveriguacaoDTO(
+            periodo="semana_atual",
+            pa=pa,
+            turno=turno,
+            servico=servico,
+            dias_semana=[dia_semana.capitalize()] if dia_semana else ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"],
+            total_respostas=total,
+            conformidade_servico={
+                "percentual": round(taxa_geral, 2),
+                "total_formularios_com_irregularidades": registros_com_problema,
+                "total_avg": total
+            },
+            total_nao_conformes=registros_com_problema,
+            vistorias=vistorias,
+            lideres=lideres,
+            next_cursor=next_cursor,
+            previous_cursor=prev_cursor
+        )

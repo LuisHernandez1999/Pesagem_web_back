@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta,timezone
-from django.utils import timezone
+from datetime import  timedelta
+from apps.averiguacao.dto.averiguacao_dto import VistoriaDTO,LiderDTO
 import json
-from django.db.models import Q, Count
+from typing import List
 from apps.averiguacao.models.averiguacao import Averiguacao
 from apps.soltura.models.soltura import Soltura
 from apps.averiguacao.dto.averiguacao_dto import AveriguacaoItemDTO,MotoristaDTO,AveriguacaoDTO,ColetorDTO
@@ -142,4 +142,38 @@ class AveriguacaoByIDMapper:
             motorista=motorista,
             coletores=coletores,
             prefixo_veiculo=registro_obj.rota_averiguada.veiculo.prefixo if registro_obj.rota_averiguada.veiculo else None
+        )
+    
+
+# mappers.py
+
+
+class AveriguacaoReportMapper:
+
+    @staticmethod
+    def to_vistoria_dto(avg: Averiguacao, campos_nao_conformes: list, campos_inadequados: list) -> VistoriaDTO:
+        total_campos = len(campos_nao_conformes) + len(campos_inadequados)
+        conformidade_servico = ((total_campos - len(campos_nao_conformes)) / total_campos * 100) if total_campos else 100
+        qualidade_rota = ((total_campos - len(campos_inadequados)) / total_campos * 100) if total_campos else 100
+
+        return VistoriaDTO(
+            vistoria_id=avg.id,
+            rota_nome=getattr(avg, "rota_nome", ""),
+            pa=avg.pa_da_averiguacao,
+            taxas={
+                "conformidade_servico": {"percentual": round(conformidade_servico, 2), "campos": campos_nao_conformes},
+                "qualidade_rota": {"percentual": round(qualidade_rota, 2), "campos": campos_inadequados}
+            }
+        )
+
+    @staticmethod
+    def to_lider_dto(averiguador: str, total: int, pas: List[str], rotas_setores: List[str], tipos_servico: List[str], turnos: List[str], dias_semana: List[str]) -> LiderDTO:
+        return LiderDTO(
+            averiguador=averiguador,
+            total_averiguacoes=total,
+            pas=pas,
+            rotas_setores=rotas_setores,
+            tipos_servico=tipos_servico,
+            turnos=turnos,
+            dias_semana=dias_semana
         )
