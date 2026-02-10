@@ -6,20 +6,24 @@ from rest_framework.permissions import IsAuthenticated
 from apps.confirmacao.models.confirmacao import ConfirmacaoServico
 from apps.confirmacao.dto.confirmacao_dto import ConfirmacaoServicoCreateDTO, ImagemConfirmacaoCreateDTO
 from apps.confirmacao.services.confirmacao_services import ConfirmacaoServicoCreateService
+from apps.confirmacao.utils.confirmacao_utils  import upload_imagem_confirmacao
 
 
 class ConfirmacaoServicoCreateView(GenericAPIView):
     permission_classes = [IsAuthenticated, DjangoModelPermissionsWithView]
     queryset = ConfirmacaoServico.objects.none()
     def post(self, request):
-        imagens_dto = [
-            ImagemConfirmacaoCreateDTO(
-                imagem=img.get("imagem"),
-                latitude=img.get("latitude"),
-                longitude=img.get("longitude"),
+        imagens_dto = []
+        for img in request.FILES.getlist("imagens"):
+            url = upload_imagem_confirmacao(img)
+            imagens_dto.append(
+                ImagemConfirmacaoCreateDTO(
+                    imagem=url,
+                    latitude=request.data.get("latitude"),
+                    longitude=request.data.get("longitude"),
+                )
             )
-            for img in request.data.get("imagens", [])
-        ]
+
         dto = ConfirmacaoServicoCreateDTO(
             nome_vistoriador=request.data.get("nome_vistoriador"),
             data_servico=request.data.get("data_servico"),
@@ -27,4 +31,4 @@ class ConfirmacaoServicoCreateView(GenericAPIView):
             imagens=imagens_dto,
         )
         result = ConfirmacaoServicoCreateService.executar(dto)
-        return Response(asdict(result))
+        return Response(asdict(result), status=201)

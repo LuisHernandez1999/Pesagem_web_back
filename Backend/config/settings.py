@@ -156,6 +156,11 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+R2_ACCESS_KEY_ID = "SUA_ACCESS_KEY"
+R2_SECRET_ACCESS_KEY = "SUA_SECRET"
+R2_BUCKET_NAME = "confirmacoes"
+R2_ENDPOINT_URL = "https://<account_id>.r2.cloudflarestorage.com"
+R2_PUBLIC_BASE_URL = "https://cdn.seudominio.com"  # ou URL pública do R2
 
 SIMPLE_JWT = {
     # 🔑 DURAÇÃO

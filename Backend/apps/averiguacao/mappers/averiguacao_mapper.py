@@ -9,8 +9,7 @@ from apps.averiguacao.utils.averiguacao_utils import (
     PA_ESTABELECIDAS,
     METAS_SEMANAIS,
     )
-
-
+from django.conf import settings
 
 
 class CriarAveriguacaoMapper:
@@ -114,7 +113,6 @@ class AveriguacaoListMapper:
 class AveriguacaoByIDMapper:
     @staticmethod
     def model_to_dto(registro_obj) -> AveriguacaoDTO:
-        # Motorista
         motorista = None
         if registro_obj.rota_averiguada.motorista:
             motorista = MotoristaDTO(
@@ -122,16 +120,14 @@ class AveriguacaoByIDMapper:
                 matricula=registro_obj.rota_averiguada.motorista.matricula
             )
 
-        # Coletores
         coletores = [
             ColetorDTO(nome=c.nome, matricula=c.matricula)
             for c in registro_obj.rota_averiguada.coletores.all()
         ]
 
-        # Imagens
         imagens = [
-            getattr(registro_obj, f"imagem{i}").url
-            for i in range(1, 8)
+            f"{settings.R2_PUBLIC_BASE_URL}/{getattr(registro_obj, f'imagem{i}')}"
+            for i in range(1, 3)
             if getattr(registro_obj, f"imagem{i}")
         ]
 
@@ -141,9 +137,11 @@ class AveriguacaoByIDMapper:
             imagens=imagens,
             motorista=motorista,
             coletores=coletores,
-            prefixo_veiculo=registro_obj.rota_averiguada.veiculo.prefixo if registro_obj.rota_averiguada.veiculo else None
+            prefixo_veiculo=(
+                registro_obj.rota_averiguada.veiculo.prefixo
+                if registro_obj.rota_averiguada.veiculo else None
+            )
         )
-    
 
 # mappers.py
 

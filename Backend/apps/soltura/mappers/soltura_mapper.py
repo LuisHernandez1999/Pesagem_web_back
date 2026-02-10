@@ -100,6 +100,7 @@ class SolturaQuerySetMapper:
             "Domiciliar",
             select_related_fields=("motorista", "rota", "veiculo"),
         )
+    
 
     # cursor 
     @staticmethod

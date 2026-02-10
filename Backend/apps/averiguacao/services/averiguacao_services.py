@@ -122,7 +122,6 @@ class AveriguacaoByIDService:
                 id=id,
                 tipo_servico__in=TIPOS_SERVICO
             ).first()
-
             if not registro_obj:
                 return AveriguacaoResponseDTO(
                     success=False,
