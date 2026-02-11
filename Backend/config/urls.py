@@ -44,10 +44,8 @@ from apps.insumos.views.insumos_views import (InsumoCreateAPIView,
 from apps.celular.views.celular_views import (CelularCreateAPIView,CelularListAPIView,
                                               CelularDeleteAPIView,CelularUpdateAPIView,)
 from apps.confirmacao.views.confirmacao_views import (ConfirmacaoServicoCreateView)
-from apps.soltura.views.soltura_views import (RemocaoListView,SeletivaListView,
-                                              DomiciliarListView,SolturaAnalyticsRemocaoView
+from apps.soltura.views.soltura_views import ( SolturaListAPIView,SolturaAnalyticsRemocaoView
                                               ,SolturaAnalyticsDomiciliarView,
-                                              SolturaCreateView,
                                               SolturaAnalyticsSeletivaView)
 from apps.soltura.views.rota_views import (RotaCreateView,RotaListView
                                            ,RotaDeleteView,RotaUpdateView)
@@ -91,10 +89,7 @@ urlpatterns = [
     path("api/celular/<int:id_celular>/delete/",  CelularDeleteAPIView.as_view(),name="CelularDelete"),
     path("api/celular/<int:id_celular>/update/",  CelularUpdateAPIView.as_view(),name="CelularUpdate"),
     path("api/create-confirmacao/",ConfirmacaoServicoCreateView.as_view(),name="CreateConfirmacao"),
-    path("api/solturas/create/", SolturaCreateView.as_view(),name="CreateService"),
-    path("api/solturas/remocao/", RemocaoListView.as_view(),name="RemocaoList"),
-    path("api/solturas/seletiva/", SeletivaListView.as_view(),name="SeletivaList"),
-    path("api/solturas/domiciliar/", DomiciliarListView.as_view(),name="DomiciliarList"),
+    path("api/solturas-list/", SolturaListAPIView.as_view(),name="SolturaList"),
     path("api/solturas-charts/remocao/",SolturaAnalyticsRemocaoView.as_view(),name="analytics-soltura-remocao",),
     path("api/solturas-charts/seletiva/",SolturaAnalyticsSeletivaView.as_view(),name="analytics-soltura-seletiva",),
     path("api/solturas-charts/domiciliar/",SolturaAnalyticsDomiciliarView.as_view(),name="analytics-soltura-domiciliar",),
