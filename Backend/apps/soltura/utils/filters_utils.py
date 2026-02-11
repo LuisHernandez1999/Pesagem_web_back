@@ -7,6 +7,17 @@ from apps.soltura.dto.soltura_dtos import ListResponseDTO
 from apps.soltura.query.pagination import CursorPaginator
 
 
+def processar_qs(qs, termo=None, cursor=None, limit=10, mapper=None):
+    qs = SolturaQuerySetMapper.aplicar_busca_global(qs, termo)
+    qs = SolturaQuerySetMapper.ordenar(qs)
+    total = qs.count()
+    qs = SolturaQuerySetMapper.aplicar_cursor(qs, cursor)
+    rows, next_cursor = CursorPaginator.paginar(qs, limit)
+    items = [mapper.from_model(o) for o in rows] if mapper else []
+    return items, next_cursor, total
+
+
+
 def listar_por_tipo(tipo_servico, termo, cursor):
     cfg = (SOLTURA_RESUMO_CONFIG, tipo_servico.lower())
     if not cfg:

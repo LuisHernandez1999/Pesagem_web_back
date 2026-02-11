@@ -4,7 +4,6 @@ from apps.confirmacao.dto.confirmacao_dto import ConfirmacaoServicoDTO
 
 
 class ConfirmacaoCreateMapper:
-
     @staticmethod
     def criar(dto) -> ConfirmacaoServicoDTO:
         confirmacao = ConfirmacaoServico.objects.create(

@@ -1,16 +1,15 @@
-from dataclasses import asdict
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from apps.soltura.models.soltura import Soltura
 from django.db import transaction
-from datetime import date
 from apps.soltura.dto.soltura_dtos  import ListResponseDTO,SolturaAnalyticsFiltroDTO
-from apps.soltura.query.pagination import CursorPaginator
 from apps.soltura.query.config import SOLTURA_RESUMO_CONFIG
-from apps.soltura.mappers.soltura_mapper import (SolturaAnalyticsQuerySetMapper,SolturaAnalyticsResultMapper,SolturaQuerySetMapper)
+from apps.soltura.mappers.soltura_mapper import (SolturaAnalyticsQuerySetMapper,SolturaAnalyticsResultMapper,
+                                                 SolturaQuerySetMapper,SolturaMapperUpdate,SolturaMapperCreate)
 from apps.soltura.utils.cache_utils import memoize_with_ttl
 from apps.soltura.dto.soltura_dtos import SolturaCreateDTO
 from apps.soltura.utils.soltura_create_utils import validar_soltura
-from apps.soltura.mappers.soltura_mapper import SolturaMapperCreate
+from apps.soltura.utils.filters_utils import processar_qs
 
 
 class SolturaServiceCreate:
@@ -22,48 +21,33 @@ class SolturaServiceCreate:
         return soltura_id
 
 
+class SolturaEditService:
+    @staticmethod
+    def edit_soltura(soltura_id, dto):
+        try:
+            return SolturaMapperUpdate.update(soltura_id, dto)
+        except Soltura.DoesNotExist:
+            raise ValueError(f"Soltura com id {soltura_id} não encontrada")
+
+
 class SolturaResumoService:
     @classmethod
     def executar(cls, termo=None, cursor=None, tipo_servico=None):
-        """
-        Retorna o resumo das solturas.
-        - Se tipo_servico for passado, retorna apenas aquele serviço (limit 10).
-        - Caso contrário, retorna todos os serviços de acordo com SOLTURA_RESUMO_CONFIG.
-        """
         items = {}
         cursores = {}
+        total = 0
+        configs = (
+            [c for c in SOLTURA_RESUMO_CONFIG if c[0] == tipo_servico.lower()]
+            if tipo_servico else SOLTURA_RESUMO_CONFIG
+        )
+        if tipo_servico and not configs:
+            raise ValidationError("tipo_servico inválido")
 
-        if tipo_servico:
-            # Filtra apenas o serviço solicitado
-            cfg = next((c for c in SOLTURA_RESUMO_CONFIG if c[0] == tipo_servico.lower()), None)
-            if not cfg:
-                raise ValidationError("tipo_servico inválido")
-
-            key, base_qs_fn, mapper, _ = cfg
-
+        for key, base_qs_fn, mapper, limit in configs:
             qs = base_qs_fn()
-            qs = SolturaQuerySetMapper.aplicar_busca_global(qs, termo)
-            qs = SolturaQuerySetMapper.ordenar(qs)
-            total = qs.count()
-            qs = SolturaQuerySetMapper.aplicar_cursor(qs, cursor)
-            rows, next_cursor = CursorPaginator.paginar(qs, 10)  # Sempre 10 por página
-
-            items[key] = [mapper.from_model(o) for o in rows]
+            itens, next_cursor, total = processar_qs(qs, termo, cursor, limit, mapper)
+            items[key] = itens
             cursores[key] = next_cursor
-
-        else:
-            # Sem filtro, percorre todos os tipos
-            for key, base_qs_fn, mapper, limit in SOLTURA_RESUMO_CONFIG:
-                qs = base_qs_fn()
-                qs = SolturaQuerySetMapper.aplicar_busca_global(qs, termo)
-                qs = SolturaQuerySetMapper.ordenar(qs)
-                total = qs.count()
-                qs = SolturaQuerySetMapper.aplicar_cursor(qs, cursor)
-                rows, next_cursor = CursorPaginator.paginar(qs, limit)
-
-                items[key] = [mapper.from_model(o) for o in rows]
-                cursores[key] = next_cursor
-
         return ListResponseDTO(
             items=items,
             total=total,
